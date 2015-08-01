@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "minified": "~2015.1.1"
+    "minified": "~2015.1.1",
+    "bootstrap": "~3.3.5"
   }
 }

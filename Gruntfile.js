@@ -59,11 +59,23 @@ module.exports = function (grunt) {
                 boss: true
             },
             gruntfile: {
-                src: 'gruntfile.js'
+                src: 'Gruntfile.js'
             },
-            all: [
+            dist: [
                 'src/*.js'
             ]
+        },
+        less: {
+            options: {
+              compress: true,
+              yuicompress: true,
+              optimization: 2
+            },
+            dist: {
+                files: {
+                  "dist/jdbcsniffer.css": "less/jdbcsniffer.less" // destination file and source file
+                }
+            }
         },
         qunit: {
             files: ['test/**/*.html']
@@ -73,9 +85,12 @@ module.exports = function (grunt) {
                 files: '<%= jshint.gruntfile.src %>',
                 tasks: ['jshint:gruntfile']
             },
-            lib_test: {
-                files: '<%= jshint.lib_test.src %>',
-                tasks: ['jshint:lib_test', 'qunit']
+            styles: {
+                files: ['less/*.less'], // which files to watch
+                tasks: ['less'],
+                options: {
+                    nospawn: true
+                }
             }
         }
     });
@@ -86,10 +101,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
-
+    grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-include-replace');
 
     // Default task
-    grunt.registerTask('default', ['jshint', /*'qunit',*/ 'includereplace', 'uglify']);
+    grunt.registerTask('default', ['less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify']);
 };
 
