@@ -6,8 +6,10 @@
 
     $(function(){
 
-        var snifferScriptElement = $('#jdbc-sniffer-script');
-        var snifferScriptSrc = snifferScriptElement.get('@src');
+        var snifferElement = $('#jdbc-sniffer');
+        var sqlQueries = snifferElement.get('%sql-queries');
+        var requestId = snifferElement.get('%request-id');
+        var snifferScriptSrc = snifferElement.get('@src');
 
         var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
@@ -19,12 +21,6 @@
             '@href' : snifferStyleHref,
             '@media' : 'all'
         }));
-
-        // load data attributes
-        // todo: move the data attributes to the script tag
-        var snifferElement = $('#jdbc-sniffer');
-        var sqlQueries = snifferElement.get('%sql-queries');
-        var requestId = snifferElement.get('%request-id');
 
         // create main GUI
         var queryList = HTML(
@@ -39,6 +35,11 @@
         var queryCounterDiv = EE('div', { 'className' : 'jdbc-sniffer-query-count' }, sqlQueries);
         queryCounterDiv.on('click', toggle);
         $('body').add(queryCounterDiv);
+
+        // create global object
+        window.jdbcSniffer = {
+            numberOfSqlQueries : parseInt(sqlQueries)
+        };
 
         // request data
         $.request('get', baseUrl + 'request/' + requestId)
