@@ -43,9 +43,9 @@
         // request data
         $.request('get', baseUrl + 'request/' + requestId)
             .then(function (data, xhr) {
+                var statementsTableBody = EE('tbody');
                 if (xhr.status === 200) {
                     var statements = $.parseJSON(data);
-                    var statementsTableBody = EE('tbody');
                     for (var i = 0; i < statements.length; i++) {
                         var statement = statements[i];
                         statementsTableBody.add(EE('tr',[
@@ -53,8 +53,13 @@
                             EE('td',statement.time)
                         ]));
                     }
-                    $('#jdbc-sniffer-queries').add(statementsTableBody);
+                } else if (xhr.status === 204) {
+                    statementsTableBody.add(EE('tr',[
+                            EE('td','No queries'),
+                            EE('td','')
+                        ]));
                 }
+                $('#jdbc-sniffer-queries').add(statementsTableBody);
             })
             .error(function (status, statusText, responseText) {
                 console.log(status + ' ' + statusText + ' ' + responseText);
