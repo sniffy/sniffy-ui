@@ -1,0 +1,24 @@
+{
+  "name": "jdbc-sniffer-ui",
+  "title": "UI for JDBC Sniffer",
+  "author": "bedrin <Dmitry.Bedrin@gmail.com>",
+  "license": "BSD-3-Clause",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bedrin/jdbc-sniffer-ui.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-copy": "^0.8.0",
+    "grunt-contrib-htmlmin": "^0.4.0",
+    "grunt-contrib-jshint": "~0.7.2",
+    "grunt-contrib-less": "^1.0.1",
+    "grunt-contrib-qunit": "*",
+    "grunt-contrib-uglify": "~0.9.1",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-include-replace": "^3.0.0"
+  }
+}

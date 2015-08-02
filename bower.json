@@ -1,0 +1,22 @@
+{
+  "name": "jdbc-sniffer-ui",
+  "version": "1.0.0",
+  "homepage": "https://github.com/bedrin/jdbc-sniffer-ui",
+  "authors": [
+    "bedrin <Dmitry.Bedrin@gmail.com>"
+  ],
+  "description": "UI for JDBC Sniffer",
+  "main": "jdbcsniffer.js",
+  "license": "BSD-3-Clause",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "minified": "~2015.1.1",
+    "bootstrap": "~3.3.5"
+  }
+}
