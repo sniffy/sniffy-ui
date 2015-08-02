@@ -26,10 +26,12 @@ module.exports = function (grunt) {
                   prefix: '//@@', // This works for HTML and JS replacements
                   suffix: ''
                 },
+                
                 // Files to perform replacements and includes with
-                src: 'src/*.js',
+                
+                src: 'dist/jdbcsniffer.js',
                 // Destination directory to copy files to
-                dest: 'dist/'
+                dest: 'dist/jdbcsniffer.js'
             }
         },
         uglify: {
@@ -37,7 +39,7 @@ module.exports = function (grunt) {
                 banner: '<%= banner %>'
             },
             dist: {
-                src: '<%= includereplace.dist.dest %>src/jdbcsniffer.js',
+                src: 'dist/jdbcsniffer.js',
                 dest: 'dist/jdbcsniffer.min.js'
             }
         },
@@ -73,7 +75,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                  "dist/jdbcsniffer.css": "less/jdbcsniffer.less" // destination file and source file
+                  "dist/jdbcsniffer.css": "src/jdbcsniffer.less" // destination file and source file
                 }
             }
         },
@@ -115,7 +117,7 @@ module.exports = function (grunt) {
     });
 
     // These plugins provide necessary tasks
-    //grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -125,6 +127,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
 
     // Default task
-    grunt.registerTask('default', ['htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify']);
+    grunt.registerTask('default', ['concat', 'htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify']);
 };
 
