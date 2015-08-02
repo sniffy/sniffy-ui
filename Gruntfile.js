@@ -119,7 +119,7 @@ module.exports = function (grunt) {
                 tasks: ['jshint:dist','concat:dist','includereplace:dist','uglify:dist']
             },
             styles: {
-                files: ['less/*.less'], // which files to watch
+                files: ['src/*.less'], // which files to watch
                 tasks: ['less:dist'/*,'replace:dist'*/],
                 options: {
                     nospawn: true

@@ -12,7 +12,7 @@
         var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
         // inject stylesheet
-        var snifferStyleHref = baseUrl + '/jdbcsniffer.css';
+        var snifferStyleHref = baseUrl + 'jdbcsniffer.css';
         $('head').add(EE('link', {
             '@rel' : 'stylesheet',
             '@type' : 'text.css',
