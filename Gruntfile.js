@@ -80,10 +80,29 @@ module.exports = function (grunt) {
         qunit: {
             files: ['test/**/*.html']
         },
+        htmlmin: {
+            dist: {
+                options: {
+                    removeComments: true,
+                    collapseWhitespace: true
+                },
+                files: {
+                    'dist/jdbcsniffer.html': 'src/jdbcsniffer.html',
+                }
+            }
+        },
         watch: {
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
                 tasks: ['jshint:gruntfile']
+            },
+            htmlmin: {
+                files: 'src/*.html',
+                tasks: ['htmlmin:dist','jshint:dist','includereplace:dist','uglify:dist']
+            },
+            src: {
+                files: 'src/*.js',
+                tasks: ['jshint:dist','includereplace:dist','uglify:dist']
             },
             styles: {
                 files: ['less/*.less'], // which files to watch
@@ -103,8 +122,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-include-replace');
+    grunt.loadNpmTasks('grunt-contrib-htmlmin');
 
     // Default task
-    grunt.registerTask('default', ['less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify']);
+    grunt.registerTask('default', ['htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify']);
 };
 
