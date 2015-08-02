@@ -42,8 +42,19 @@
 
         // request data
         $.request('get', baseUrl + 'request/' + requestId)
-            .then(function (data) {
-                console.log(data);
+            .then(function (data, xhr) {
+                if (xhr.status === 200) {
+                    var statements = $.parseJSON(data);
+                    var statementsTableBody = EE('tbody');
+                    for (var i = 0; i < statements.length; i++) {
+                        var statement = statements[i];
+                        statementsTableBody.add(EE('tr',[
+                            EE('td',statement.query),
+                            EE('td',statement.time)
+                        ]));
+                    }
+                    $('#jdbc-sniffer-queries').add(statementsTableBody);
+                }
             })
             .error(function (status, statusText, responseText) {
                 console.log(status + ' ' + statusText + ' ' + responseText);

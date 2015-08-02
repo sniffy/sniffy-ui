@@ -10,6 +10,14 @@ module.exports = function (grunt) {
             '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
             ' Licensed <%= pkg.license %> */\n',
         // Task configuration
+        copy: {
+            dist: {
+                expand: true,
+                cwd: 'mock/',
+                src: '**',
+                dest: 'dist/'
+            },
+        },
         concat: {
             options: {
                 banner: '<%= banner %>',
@@ -94,17 +102,21 @@ module.exports = function (grunt) {
             }
         },
         watch: {
+            copy: {
+                files: ['mock/*','mock/**/*'],
+                tasks: ['copy:dist']
+            },
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
                 tasks: ['jshint:gruntfile']
             },
             htmlmin: {
                 files: 'src/*.html',
-                tasks: ['htmlmin:dist','jshint:dist','includereplace:dist','uglify:dist']
+                tasks: ['htmlmin:dist','jshint:dist','concat:dist','includereplace:dist','uglify:dist']
             },
             src: {
                 files: 'src/*.js',
-                tasks: ['jshint:dist','includereplace:dist','uglify:dist']
+                tasks: ['jshint:dist','concat:dist','includereplace:dist','uglify:dist']
             },
             styles: {
                 files: ['less/*.less'], // which files to watch
@@ -125,8 +137,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-include-replace');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Default task
-    grunt.registerTask('default', ['concat', 'htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify']);
+    grunt.registerTask('default', ['copy', 'concat', 'htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify']);
 };
 
