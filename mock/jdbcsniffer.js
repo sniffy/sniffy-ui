@@ -17,6 +17,39 @@
 
         var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
+        function loadQueries(url, requestId) {
+            $.request('get', baseUrl + 'request/' + requestId)
+                .then(function (data, xhr) {
+                    var statementsTableBody = $('#jdbc-sniffer-queries');
+                    statementsTableBody.add(EE('tr',[
+                        EE('td', {'className' : 'col-md-12 success', '@colspan' : '2'}, url)
+                    ]));
+                    var noQueriesRow = EE('tr',[
+                        EE('td','No queries'),
+                        EE('td','')
+                    ]);
+                    if (xhr.status === 200) {
+                        var statements = $.parseJSON(data);
+                        if (statements.length === 0) {
+                            statementsTableBody.add(noQueriesRow);
+                        } else {
+                            for (var i = 0; i < statements.length; i++) {
+                                var statement = statements[i];
+                                statementsTableBody.add(EE('tr',[
+                                    EE('td',statement.query),
+                                    EE('td',statement.time)
+                                ]));
+                            }
+                        }
+                    } else if (xhr.status === 204) {
+                        statementsTableBody.add(noQueriesRow);
+                    }
+                })
+                .error(function (status, statusText, responseText) {
+                    console.log(status + ' ' + statusText + ' ' + responseText);
+                });
+        }
+
         // inject stylesheet
         var snifferStyleHref = baseUrl + 'jdbcsniffer.css';
         $('head').add(EE('link', {
@@ -28,7 +61,7 @@
 
         // create main GUI
         var queryList = HTML(
-            '<div class="jdbc-sniffer-ui" style="display:none"><div class="container"><div class="panel panel-info"><div class="panel-heading"><button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button><h3 class="panel-title">Executed Queries</h3></div><table class="table table-hover" id="jdbc-sniffer-queries"><thead><tr><th class="col-md-10">Query</th><th class="col-md-2">Elapsed Time (millis)</th></tr></thead></table><div class="panel-footer">Powered by <a href="https://github.com/bedrin/jdbc-sniffer" target="_blank">JDBC Sniffer</a></div></div></div></div>'
+            '<div class="jdbc-sniffer-ui" style="display:none"><div class="container"><div class="panel panel-info"><div class="panel-heading"><button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button><h3 class="panel-title">Executed Queries</h3></div><table class="table table-hover"><thead><tr><th class="col-md-10">Query</th><th class="col-md-2">Elapsed Time (millis)</th></tr></thead><tbody id="jdbc-sniffer-queries"></tbody></table><div class="panel-footer">Powered by <a href="https://github.com/bedrin/jdbc-sniffer" target="_blank">JDBC Sniffer</a></div></div></div></div>'
         );
 
         $('body').add(queryList);
@@ -46,82 +79,62 @@
         };
 
         // request data
-        $.request('get', baseUrl + 'request/' + requestId)
-            .then(function (data, xhr) {
-                var statementsTableBody = EE('tbody');
-                if (xhr.status === 200) {
-                    var statements = $.parseJSON(data);
-                    for (var i = 0; i < statements.length; i++) {
-                        var statement = statements[i];
-                        statementsTableBody.add(EE('tr',[
-                            EE('td',statement.query),
-                            EE('td',statement.time)
-                        ]));
+        loadQueries(location.pathname, requestId);
+
+        
+
+        // Intercept ajax queries
+        (function(XHR) {
+            
+            var open = XHR.prototype.open;
+            var send = XHR.prototype.send;
+            
+            XHR.prototype.open = function(method, url, async, user, pass) {
+                this._url = url;
+                open.call(this, method, url, async, user, pass);
+            };
+            
+            XHR.prototype.send = function(data) {
+                var self = this;
+                var start;
+                var oldOnReadyStateChange;
+                var url = this._url;
+                
+                function onReadyStateChange() {
+                    if(self.readyState === 4 /* complete */) {
+                        var sqlQueries = self.getResponseHeader("X-Sql-Queries");
+                        if (sqlQueries && parseInt(sqlQueries) > 0) {
+                            var requestId = self.getResponseHeader("X-Request-Id");
+                            ajaxRequests.push({
+                                "url" : url,
+                                "requestId" : requestId,
+                                "sqlQueries" : sqlQueries,
+                                "elapsedTime" : new Date().getTime() - start.getTime()
+                            });
+                            loadQueries(url, requestId);
+                        }
                     }
-                } else if (xhr.status === 204) {
-                    statementsTableBody.add(EE('tr',[
-                            EE('td','No queries'),
-                            EE('td','')
-                        ]));
+                    
+                    if(oldOnReadyStateChange) {
+                        oldOnReadyStateChange();
+                    }
                 }
-                $('#jdbc-sniffer-queries').add(statementsTableBody);
-            })
-            .error(function (status, statusText, responseText) {
-                console.log(status + ' ' + statusText + ' ' + responseText);
-            });
+                
+                if(!this.noIntercept) {
+                    start = new Date();
+                    
+                    if(this.addEventListener) {
+                        this.addEventListener("readystatechange", onReadyStateChange, false);
+                    } else {
+                        oldOnReadyStateChange = this.onreadystatechange; 
+                        this.onreadystatechange = onReadyStateChange;
+                    }
+                }
+                
+                send.call(this, data);
+            };
+        })(XMLHttpRequest);
 
     });
-
-    // Intercept ajax queries
-    (function(XHR) {
-        
-        var open = XHR.prototype.open;
-        var send = XHR.prototype.send;
-        
-        XHR.prototype.open = function(method, url, async, user, pass) {
-            this._url = url;
-            open.call(this, method, url, async, user, pass);
-        };
-        
-        XHR.prototype.send = function(data) {
-            var self = this;
-            var start;
-            var oldOnReadyStateChange;
-            var url = this._url;
-            
-            function onReadyStateChange() {
-                if(self.readyState === 4 /* complete */) {
-                    var sqlQueries = self.getResponseHeader("X-Sql-Queries");
-                    if (sqlQueries && parseInt(sqlQueries) > 0) {
-                        var requestId = self.getResponseHeader("X-Request-Id");
-                        ajaxRequests.push({
-                            "url" : url,
-                            "requestId" : requestId,
-                            "sqlQueries" : sqlQueries,
-                            "elapsedTime" : new Date().getTime() - start.getTime()
-                        });
-                    }
-                    console.log(ajaxRequests);
-                }
-                
-                if(oldOnReadyStateChange) {
-                    oldOnReadyStateChange();
-                }
-            }
-            
-            if(!this.noIntercept) {
-                start = new Date();
-                
-                if(this.addEventListener) {
-                    this.addEventListener("readystatechange", onReadyStateChange, false);
-                } else {
-                    oldOnReadyStateChange = this.onreadystatechange; 
-                    this.onreadystatechange = onReadyStateChange;
-                }
-            }
-            
-            send.call(this, data);
-        };
-    })(XMLHttpRequest);
 
 }());
