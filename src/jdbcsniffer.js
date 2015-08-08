@@ -4,6 +4,8 @@
     var MINI = require('minified');
     var $ = MINI.$, EE = MINI.EE, HTML = MINI.HTML;
 
+    var ajaxRequests = [];
+
     $(function(){
 
         var snifferElement = $('#jdbc-sniffer');
@@ -67,5 +69,56 @@
             });
 
     });
+
+    // Intercept ajax queries
+    (function(XHR) {
+        
+        var open = XHR.prototype.open;
+        var send = XHR.prototype.send;
+        
+        XHR.prototype.open = function(method, url, async, user, pass) {
+            this._url = url;
+            open.call(this, method, url, async, user, pass);
+        };
+        
+        XHR.prototype.send = function(data) {
+            var self = this;
+            var start;
+            var oldOnReadyStateChange;
+            var url = this._url;
+            
+            function onReadyStateChange() {
+                if(self.readyState === 4 /* complete */) {
+                    var sqlQueries = self.getResponseHeader("X-Sql-Queries");
+                    if (sqlQueries && parseInt(sqlQueries) > 0) {
+                        var requestId = self.getResponseHeader("X-Request-Id");
+                        ajaxRequests.push({
+                            "url" : url,
+                            "requestId" : requestId,
+                            "sqlQueries" : sqlQueries,
+                            "elapsedTime" : new Date().getTime() - start.getTime()
+                        });
+                    }
+                }
+                
+                if(oldOnReadyStateChange) {
+                    oldOnReadyStateChange();
+                }
+            }
+            
+            if(!this.noIntercept) {
+                start = new Date();
+                
+                if(this.addEventListener) {
+                    this.addEventListener("readystatechange", onReadyStateChange, false);
+                } else {
+                    oldOnReadyStateChange = this.onreadystatechange; 
+                    this.onreadystatechange = onReadyStateChange;
+                }
+            }
+            
+            send.call(this, data);
+        };
+    })(XMLHttpRequest);
 
 }());

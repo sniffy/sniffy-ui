@@ -18,8 +18,7 @@ grunt watch
 ## Testing with mock server
 
 ```
-npm install http-server -g
-http-server
+node index.js
 ```
 
-Now open http://localhost:8080/dist/mock.html in your browser and have fun!
+Now open [http://localhost:3000/dist/mock.html](http://localhost:3000/dist/mock.html) in your browser and have fun!
