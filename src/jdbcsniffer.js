@@ -4,6 +4,17 @@
     var MINI = require('minified');
     var $ = MINI.$, EE = MINI.EE, HTML = MINI.HTML;
 
+    window.jdbcSniffer = {numberOfSqlQueries : 0};
+
+    var ajaxRequests = [];
+    var loadQueries = function(url, requestId) {
+        ajaxRequests.push({"url":url,"requestId":requestId});
+    };
+
+    var incrementQueryCounter = function(numQueries) {
+        window.jdbcSniffer.numberOfSqlQueries += numQueries;
+    };
+
     $(function(){
 
         var snifferElement = $('#jdbc-sniffer');
@@ -36,36 +47,106 @@
         queryCounterDiv.on('click', toggle);
         $('body').add(queryCounterDiv);
 
-        // create global object
-        window.jdbcSniffer = {
-            numberOfSqlQueries : parseInt(sqlQueries)
+        incrementQueryCounter = function(numQueries) {
+            // increment global counter
+            window.jdbcSniffer.numberOfSqlQueries += numQueries;
+            $('.jdbc-sniffer-query-count').fill(window.jdbcSniffer.numberOfSqlQueries);
         };
+        
+        incrementQueryCounter(parseInt(sqlQueries));
 
         // request data
-        $.request('get', baseUrl + 'request/' + requestId)
-            .then(function (data, xhr) {
-                var statementsTableBody = EE('tbody');
-                if (xhr.status === 200) {
-                    var statements = $.parseJSON(data);
-                    for (var i = 0; i < statements.length; i++) {
-                        var statement = statements[i];
-                        statementsTableBody.add(EE('tr',[
-                            EE('td',statement.query),
-                            EE('td',statement.time)
-                        ]));
-                    }
-                } else if (xhr.status === 204) {
+        loadQueries(location.pathname, requestId);
+
+        loadQueries = function(url, requestId) {
+            $.request('get', baseUrl + 'request/' + requestId)
+                .then(function (data, xhr) {
+                    var statementsTableBody = $('#jdbc-sniffer-queries');
                     statementsTableBody.add(EE('tr',[
-                            EE('td','No queries'),
-                            EE('td','')
-                        ]));
-                }
-                $('#jdbc-sniffer-queries').add(statementsTableBody);
-            })
-            .error(function (status, statusText, responseText) {
-                console.log(status + ' ' + statusText + ' ' + responseText);
-            });
+                        EE('td', {'className' : 'col-md-12 success', '@colspan' : '2'}, url)
+                    ]));
+                    var noQueriesRow = EE('tr',[
+                        EE('td','No queries'),
+                        EE('td','')
+                    ]);
+                    if (xhr.status === 200) {
+                        var statements = $.parseJSON(data);
+                        if (statements.length === 0) {
+                            statementsTableBody.add(noQueriesRow);
+                        } else {
+                            for (var i = 0; i < statements.length; i++) {
+                                var statement = statements[i];
+                                statementsTableBody.add(EE('tr',[
+                                    EE('td',statement.query),
+                                    EE('td',statement.time)
+                                ]));
+                            }
+                        }
+                    } else if (xhr.status === 204) {
+                        statementsTableBody.add(noQueriesRow);
+                    }
+                })
+                .error(function (status, statusText, responseText) {
+                    console.log(status + ' ' + statusText + ' ' + responseText);
+                });
+        };
+
+        for (var i = 0; i < ajaxRequests.length; i++) {
+            var ajaxRequest = ajaxRequests[i];
+            loadQueries(ajaxRequest.url, ajaxRequest.requestId);
+        }
 
     });
+
+    // Intercept ajax queries
+    (function(XHR) {
+        
+        var open = XHR.prototype.open;
+        var send = XHR.prototype.send;
+        
+        XHR.prototype.open = function(method, url, async, user, pass) {
+            this._url = url;
+            this._method = method;
+            open.call(this, method, url, async, user, pass);
+        };
+        
+        XHR.prototype.send = function(data) {
+            var self = this;
+            var start;
+            var oldOnReadyStateChange;
+            var url = this._url;
+            var method = this._method;
+            
+            function onReadyStateChange() {
+                if(self.readyState === 4 /* complete */) {
+                    var sqlQueries = self.getResponseHeader("X-Sql-Queries");
+                    if (sqlQueries && parseInt(sqlQueries) > 0) {
+                        incrementQueryCounter(parseInt(sqlQueries));
+                        var requestId = self.getResponseHeader("X-Request-Id");
+                        url = url.charAt(0) === '/' ? url : 
+                            location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1) + url;
+                        loadQueries(method + ' ' + url, requestId);
+                    }
+                }
+                
+                if(oldOnReadyStateChange) {
+                    oldOnReadyStateChange();
+                }
+            }
+            
+            if(!this.noIntercept) {
+                start = new Date();
+                
+                if(this.addEventListener) {
+                    this.addEventListener("readystatechange", onReadyStateChange, false);
+                } else {
+                    oldOnReadyStateChange = this.onreadystatechange; 
+                    this.onreadystatechange = onReadyStateChange;
+                }
+            }
+            
+            send.call(this, data);
+        };
+    })(XMLHttpRequest);
 
 }());

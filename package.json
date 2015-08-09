@@ -3,12 +3,14 @@
   "title": "UI for JDBC Sniffer",
   "author": "bedrin <Dmitry.Bedrin@gmail.com>",
   "license": "BSD-3-Clause",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/bedrin/jdbc-sniffer-ui.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "express": "^4.13.3"
+  },
   "devDependencies": {
     "grunt": "~0.4.2",
     "grunt-contrib-concat": "~0.3.0",

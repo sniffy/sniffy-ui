@@ -13,9 +13,9 @@ module.exports = function (grunt) {
         copy: {
             dist: {
                 expand: true,
-                cwd: 'mock/',
+                cwd: 'dist/',
                 src: '**',
-                dest: 'dist/'
+                dest: 'mock/'
             },
         },
         concat: {
@@ -31,14 +31,10 @@ module.exports = function (grunt) {
         includereplace: {
             dist: {
                 options: {
-                  prefix: '//@@', // This works for HTML and JS replacements
+                  prefix: '//@@',
                   suffix: ''
                 },
-                
-                // Files to perform replacements and includes with
-                
                 src: 'dist/jdbcsniffer.js',
-                // Destination directory to copy files to
                 dest: 'dist/jdbcsniffer.js'
             }
         },
@@ -102,25 +98,21 @@ module.exports = function (grunt) {
             }
         },
         watch: {
-            copy: {
-                files: ['mock/*','mock/**/*'],
-                tasks: ['copy:dist']
-            },
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
                 tasks: ['jshint:gruntfile']
             },
             htmlmin: {
                 files: 'src/*.html',
-                tasks: ['htmlmin:dist','jshint:dist','concat:dist','includereplace:dist','uglify:dist']
+                tasks: ['htmlmin:dist','jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:dist']
             },
             src: {
                 files: 'src/*.js',
-                tasks: ['jshint:dist','concat:dist','includereplace:dist','uglify:dist']
+                tasks: ['jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:dist']
             },
             styles: {
                 files: ['src/*.less'], // which files to watch
-                tasks: ['less:dist'/*,'replace:dist'*/],
+                tasks: ['less:dist','copy:dist'/*,'replace:dist'*/],
                 options: {
                     nospawn: true
                 }
@@ -140,6 +132,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Default task
-    grunt.registerTask('default', ['copy', 'concat', 'htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify']);
+    grunt.registerTask('default', ['concat', 'htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify', 'copy']);
 };
 
