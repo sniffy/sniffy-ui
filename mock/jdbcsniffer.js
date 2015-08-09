@@ -1,4 +1,4 @@
-/*! jdbc-sniffer-ui - v1.1.0 - 2015-08-08
+/*! jdbc-sniffer-ui - v1.1.0 - 2015-08-09
 * Copyright (c) 2015 ; Licensed BSD-3-Clause */
 ;(function(){
 
@@ -6,7 +6,16 @@
     var MINI = require('minified');
     var $ = MINI.$, EE = MINI.EE, HTML = MINI.HTML;
 
+    window.jdbcSniffer = {numberOfSqlQueries : 0};
+
     var ajaxRequests = [];
+    var loadQueries = function(url, requestId) {
+        ajaxRequests.push({"url":url,"requestId":requestId});
+    };
+
+    var incrementQueryCounter = function(numQueries) {
+        window.jdbcSniffer.numberOfSqlQueries += numQueries;
+    };
 
     $(function(){
 
@@ -17,7 +26,41 @@
 
         var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
-        function loadQueries(url, requestId) {
+        // inject stylesheet
+        var snifferStyleHref = baseUrl + 'jdbcsniffer.css';
+        $('head').add(EE('link', {
+            '@rel' : 'stylesheet',
+            '@type' : 'text.css',
+            '@href' : snifferStyleHref,
+            '@media' : 'all'
+        }));
+
+        // create main GUI
+        var queryList = HTML(
+            '<div class="jdbc-sniffer-ui" style="display:none"><div class="container"><div class="panel panel-info"><div class="panel-heading"><button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button><h3 class="panel-title">Executed Queries</h3></div><table class="table table-hover"><thead><tr><th class="col-md-10">Query</th><th class="col-md-2">Elapsed Time (millis)</th></tr></thead><tbody id="jdbc-sniffer-queries"></tbody></table><div class="panel-footer">Powered by <a href="https://github.com/bedrin/jdbc-sniffer" target="_blank">JDBC Sniffer</a></div></div></div></div>'
+        );
+
+        $('body').add(queryList);
+        var toggle = queryList.toggle({'$display': 'none'}, {'$display': 'block'});
+        $('button.close', queryList).on('click', toggle);
+
+        // append toolbar
+        var queryCounterDiv = EE('div', { 'className' : 'jdbc-sniffer-query-count' }, sqlQueries);
+        queryCounterDiv.on('click', toggle);
+        $('body').add(queryCounterDiv);
+
+        incrementQueryCounter = function(numQueries) {
+            // increment global counter
+            window.jdbcSniffer.numberOfSqlQueries += numQueries;
+            $('.jdbc-sniffer-query-count').fill(window.jdbcSniffer.numberOfSqlQueries);
+        };
+        
+        incrementQueryCounter(parseInt(sqlQueries));
+
+        // request data
+        loadQueries(location.pathname, requestId);
+
+        loadQueries = function(url, requestId) {
             $.request('get', baseUrl + 'request/' + requestId)
                 .then(function (data, xhr) {
                     var statementsTableBody = $('#jdbc-sniffer-queries');
@@ -48,93 +91,64 @@
                 .error(function (status, statusText, responseText) {
                     console.log(status + ' ' + statusText + ' ' + responseText);
                 });
-        }
-
-        // inject stylesheet
-        var snifferStyleHref = baseUrl + 'jdbcsniffer.css';
-        $('head').add(EE('link', {
-            '@rel' : 'stylesheet',
-            '@type' : 'text.css',
-            '@href' : snifferStyleHref,
-            '@media' : 'all'
-        }));
-
-        // create main GUI
-        var queryList = HTML(
-            '<div class="jdbc-sniffer-ui" style="display:none"><div class="container"><div class="panel panel-info"><div class="panel-heading"><button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button><h3 class="panel-title">Executed Queries</h3></div><table class="table table-hover"><thead><tr><th class="col-md-10">Query</th><th class="col-md-2">Elapsed Time (millis)</th></tr></thead><tbody id="jdbc-sniffer-queries"></tbody></table><div class="panel-footer">Powered by <a href="https://github.com/bedrin/jdbc-sniffer" target="_blank">JDBC Sniffer</a></div></div></div></div>'
-        );
-
-        $('body').add(queryList);
-        var toggle = queryList.toggle({'$display': 'none'}, {'$display': 'block'});
-        $('button.close', queryList).on('click', toggle);
-
-        // append toolbar
-        var queryCounterDiv = EE('div', { 'className' : 'jdbc-sniffer-query-count' }, sqlQueries);
-        queryCounterDiv.on('click', toggle);
-        $('body').add(queryCounterDiv);
-
-        // create global object
-        window.jdbcSniffer = {
-            numberOfSqlQueries : parseInt(sqlQueries)
         };
 
-        // request data
-        loadQueries(location.pathname, requestId);
-
-        
-
-        // Intercept ajax queries
-        (function(XHR) {
-            
-            var open = XHR.prototype.open;
-            var send = XHR.prototype.send;
-            
-            XHR.prototype.open = function(method, url, async, user, pass) {
-                this._url = url;
-                open.call(this, method, url, async, user, pass);
-            };
-            
-            XHR.prototype.send = function(data) {
-                var self = this;
-                var start;
-                var oldOnReadyStateChange;
-                var url = this._url;
-                
-                function onReadyStateChange() {
-                    if(self.readyState === 4 /* complete */) {
-                        var sqlQueries = self.getResponseHeader("X-Sql-Queries");
-                        if (sqlQueries && parseInt(sqlQueries) > 0) {
-                            var requestId = self.getResponseHeader("X-Request-Id");
-                            ajaxRequests.push({
-                                "url" : url,
-                                "requestId" : requestId,
-                                "sqlQueries" : sqlQueries,
-                                "elapsedTime" : new Date().getTime() - start.getTime()
-                            });
-                            loadQueries(url, requestId);
-                        }
-                    }
-                    
-                    if(oldOnReadyStateChange) {
-                        oldOnReadyStateChange();
-                    }
-                }
-                
-                if(!this.noIntercept) {
-                    start = new Date();
-                    
-                    if(this.addEventListener) {
-                        this.addEventListener("readystatechange", onReadyStateChange, false);
-                    } else {
-                        oldOnReadyStateChange = this.onreadystatechange; 
-                        this.onreadystatechange = onReadyStateChange;
-                    }
-                }
-                
-                send.call(this, data);
-            };
-        })(XMLHttpRequest);
+        for (var i = 0; i < ajaxRequests.length; i++) {
+            var ajaxRequest = ajaxRequests[i];
+            loadQueries(ajaxRequest.url, ajaxRequest.requestId);
+        }
 
     });
+
+    // Intercept ajax queries
+    (function(XHR) {
+        
+        var open = XHR.prototype.open;
+        var send = XHR.prototype.send;
+        
+        XHR.prototype.open = function(method, url, async, user, pass) {
+            this._url = url;
+            this._method = method;
+            open.call(this, method, url, async, user, pass);
+        };
+        
+        XHR.prototype.send = function(data) {
+            var self = this;
+            var start;
+            var oldOnReadyStateChange;
+            var url = this._url;
+            var method = this._method;
+            
+            function onReadyStateChange() {
+                if(self.readyState === 4 /* complete */) {
+                    var sqlQueries = self.getResponseHeader("X-Sql-Queries");
+                    if (sqlQueries && parseInt(sqlQueries) > 0) {
+                        incrementQueryCounter(parseInt(sqlQueries));
+                        var requestId = self.getResponseHeader("X-Request-Id");
+                        url = url.charAt(0) === '/' ? url : 
+                            location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1) + url;
+                        loadQueries(method + ' ' + url, requestId);
+                    }
+                }
+                
+                if(oldOnReadyStateChange) {
+                    oldOnReadyStateChange();
+                }
+            }
+            
+            if(!this.noIntercept) {
+                start = new Date();
+                
+                if(this.addEventListener) {
+                    this.addEventListener("readystatechange", onReadyStateChange, false);
+                } else {
+                    oldOnReadyStateChange = this.onreadystatechange; 
+                    this.onreadystatechange = onReadyStateChange;
+                }
+            }
+            
+            send.call(this, data);
+        };
+    })(XMLHttpRequest);
 
 }());
