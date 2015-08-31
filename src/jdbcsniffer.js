@@ -1,6 +1,19 @@
 ;(function(){
 
+    /*jshint unused:false*/
+
+    var defs = {};
+
+    function require(name) {
+        return defs[name];
+    }
+
+    function define(name, f) {
+        defs[name] = defs[name] || f(require);
+    }
+
     //@@include('../bower_components/minified/dist/minified.js')
+
     var MINI = require('minified');
     var $ = MINI.$, EE = MINI.EE, HTML = MINI.HTML;
 
@@ -149,4 +162,4 @@
         };
     })(XMLHttpRequest);
 
-}());
+}.apply({}));

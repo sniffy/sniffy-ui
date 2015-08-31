@@ -21,4 +21,4 @@ grunt watch
 node index.js
 ```
 
-Now open [http://localhost:3000/dist/mock.html](http://localhost:3000/dist/mock.html) in your browser and have fun!
+Now open [http://localhost:3000/mock/mock.html](http://localhost:3000/mock/mock.html) in your browser and have fun!
