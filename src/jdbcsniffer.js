@@ -41,7 +41,7 @@
         var snifferStyleHref = baseUrl + 'jdbcsniffer.css';
         $('head').add(EE('link', {
             '@rel' : 'stylesheet',
-            '@type' : 'text.css',
+            '@type' : 'text/css',
             '@href' : snifferStyleHref,
             '@media' : 'all'
         }));
