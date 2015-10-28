@@ -30,12 +30,13 @@
 
     $(function(){
 
+        var snifferHeaderElement = $('#jdbc-sniffer-header');
+        var requestId = snifferHeaderElement.get('%request-id');
+        var snifferScriptSrc = snifferHeaderElement.get('@src');
+        var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
+
         var snifferElement = $('#jdbc-sniffer');
         var sqlQueries = snifferElement.get('%sql-queries');
-        var requestId = snifferElement.get('%request-id');
-        var snifferScriptSrc = snifferElement.get('@src');
-
-        var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
         // inject stylesheet
         var snifferStyleHref = baseUrl + 'jdbcsniffer.css';

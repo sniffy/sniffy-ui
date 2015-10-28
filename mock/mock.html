@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
+		<script id="jdbc-sniffer-header" type="application/javascript" src="/mock/jdbcsniffer.min.js" data-request-id="a54b32e7-b94b-450b-b145-0cf62270d32a"></script>
 		<title>JDBC Sniffer Integration</title>
 		<script>
 
@@ -15,6 +16,8 @@
 
 			}
 
+			doAjax();
+
 		</script>
 	</head>
 	<body>
@@ -22,6 +25,6 @@
 		<iframe id="frame" src="frame.html" style="position: absolute; width: 1px; height: 1px; left: -9999px; display: none;"></iframe>
 		<div id="result"></div>
 		<button id="button" onclick="doAjax()">Click me!</button>
+		<data id="jdbc-sniffer" data-sql-queries="2" ></script>
 	</body>
 </html>
-<script id="jdbc-sniffer" data-sql-queries="2" data-request-id="a54b32e7-b94b-450b-b145-0cf62270d32a" type="application/javascript" src="/mock/jdbcsniffer.min.js"></script>
