@@ -70,10 +70,10 @@
         incrementQueryCounter(parseInt(sqlQueries));
 
         // request data
-        loadQueries(location.pathname, requestId);
+        loadQueries(location.pathname, baseUrl + 'request/' + requestId);
 
-        loadQueries = function(url, requestId) {
-            $.request('get', baseUrl + 'request/' + requestId)
+        loadQueries = function(url, requestDetailsUrl) {
+            $.request('get', requestDetailsUrl)
                 .then(function (data, xhr) {
                     var statementsTableBody = $('#jdbc-sniffer-queries');
                     statementsTableBody.add(EE('tr',[
@@ -136,10 +136,17 @@
                     var sqlQueries = self.getResponseHeader("X-Sql-Queries");
                     if (sqlQueries && parseInt(sqlQueries) > 0) {
                         incrementQueryCounter(parseInt(sqlQueries));
-                        var requestId = self.getResponseHeader("X-Request-Id");
-                        url = url.charAt(0) === '/' ? url : 
-                            location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1) + url;
-                        loadQueries(method + ' ' + url, requestId);
+
+                        var xRequestDetailsHeader = self.getResponseHeader("X-Request-Details"); // details url relative to ajax original request
+
+                        var ajaxUrl = document.createElement('a');
+                        ajaxUrl.href = url;
+
+                        var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
+                        var ajaxUrlLabel = (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
+                            ajaxUrl.pathname + ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
+
+                        loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
                     }
                 }
                 
