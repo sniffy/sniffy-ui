@@ -11,12 +11,18 @@ module.exports = function (grunt) {
             ' Licensed <%= pkg.license %> */\n',
         // Task configuration
         copy: {
-            dist: {
+            mock: {
                 expand: true,
                 cwd: 'dist/',
                 src: '**',
                 dest: 'mock/'
             },
+            libs: {
+                expand: true,
+                cwd: 'bower_components/bootstrap/dist/',
+                src: '**',
+                dest: 'dist/bootstrap/'
+            }
         },
         concat: {
             options: {
@@ -90,7 +96,8 @@ module.exports = function (grunt) {
             dist: {
                 options: {
                     removeComments: true,
-                    collapseWhitespace: true
+                    collapseWhitespace: true,
+                    minifyCSS: true
                 },
                 files: {
                     'dist/jdbcsniffer.html': 'src/jdbcsniffer.html',
@@ -105,15 +112,15 @@ module.exports = function (grunt) {
             },
             htmlmin: {
                 files: 'src/*.html',
-                tasks: ['htmlmin:dist','jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:dist']
+                tasks: ['htmlmin:dist','copy:libs','jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:mock']
             },
             src: {
                 files: 'src/*.js',
-                tasks: ['jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:dist']
+                tasks: ['jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:mock']
             },
             styles: {
                 files: ['src/*.less'], // which files to watch
-                tasks: ['less:dist','copy:dist'/*,'replace:dist'*/],
+                tasks: ['less:dist','copy:mock'/*,'replace:dist'*/],
                 options: {
                     nospawn: true
                 }
