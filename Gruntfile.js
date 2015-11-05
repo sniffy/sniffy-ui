@@ -94,6 +94,7 @@ module.exports = function (grunt) {
                 },
                 files: {
                     'dist/jdbcsniffer.html': 'src/jdbcsniffer.html',
+                    'dist/jdbcsniffer.iframe.html': 'src/jdbcsniffer.iframe.html'
                 }
             }
         },
@@ -130,6 +131,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-include-replace');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-notify');
 
     // Default task
     grunt.registerTask('default', ['concat', 'htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify', 'copy']);
