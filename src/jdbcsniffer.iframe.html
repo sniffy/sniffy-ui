@@ -2,23 +2,36 @@
 <html>
 <head>
 	<title>JDBC Sniffer</title>
+	<link rel="stylesheet" href="bootstrap/css/bootstrap.css"/>
 	<script type="text/javascript">
 	</script>
+	<style>
+	html, body, body > div.panel {
+		height: 100%;
+		margin: 0;
+		padding: 0;
+	}
+	</style>
 </head>
 <body>
-	<table class="table table-hover">
-		<thead>
-			<tr>
-				<th class="col-md-10">Query</th>
-				<th class="col-md-2">Elapsed Time (millis)</th>
-			</tr>
-		</thead>
-		<tbody id="jdbc-sniffer-queries">
-			<tr>
-				<td>SELECT 1 FROM DUAL</td>
-				<td>500</td>
-			</tr>
-		</tbody>
-	</table>
+	<div class="panel panel-info">
+		<div class="panel-heading">
+			<button type="button" class="close" aria-label="Close" id="jdbcsniffer-iframe-close"><span aria-hidden="true">×</span></button>
+			<h3 class="panel-title">Executed Queries</h3>
+		</div>
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th class="col-md-10">Query</th>
+					<th class="col-md-2">Elapsed Time (millis)</th>
+				</tr>
+			</thead>
+			<tbody id="jdbc-sniffer-queries">
+			</tbody>
+		</table>
+		<div class="panel-footer">
+			Powered by <a href="https://github.com/bedrin/jdbc-sniffer" target="_blank">JDBC Sniffer</a>
+		</div>
+	</div>
 </body>
 </html>
