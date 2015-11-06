@@ -2,6 +2,8 @@
 
     /*jshint unused:false*/
 
+    // require/define basic support
+
     var defs = {};
 
     function require(name) {
@@ -12,12 +14,18 @@
         defs[name] = defs[name] || f(require);
     }
 
+    // include libraries: minified.js
+
     //@@include('../bower_components/minified/dist/minified.js')
 
     var MINI = require('minified');
     var $ = MINI.$, EE = MINI.EE, HTML = MINI.HTML;
 
-    window.jdbcSniffer = {numberOfSqlQueries : 0};
+    // register jdbcSniffer in global scope
+
+    window.jdbcSniffer = {
+        numberOfSqlQueries : 0
+    };
 
     var ajaxRequests = [];
     var loadQueries = function(url, requestId) {
@@ -25,8 +33,11 @@
     };
 
     var incrementQueryCounter = function(numQueries) {
+        // increment global counter
         window.jdbcSniffer.numberOfSqlQueries += numQueries;
     };
+
+    // setup sniffer UI on dom ready
 
     $(function(){
 
@@ -39,27 +50,29 @@
         var sqlQueries = snifferElement.get('%sql-queries');
 
         // inject stylesheet
-        var snifferStyleHref = baseUrl + 'jdbcsniffer.css';
-        $('head').add(EE('link', {
-            '@rel' : 'stylesheet',
-            '@type' : 'text/css',
-            '@href' : snifferStyleHref,
-            '@media' : 'all'
-        }));
+        $('head').add(EE('style', '//@@include("../dist/jdbcsniffer.css")'));
 
         // create main GUI
-        var queryList = HTML(
-            '//@@include("../dist/jdbcsniffer.html")'
-        );
 
-        $('body').add(queryList);
-        var toggle = queryList.toggle({'$display': 'none'}, {'$display': 'block'});
-        $('button.close', queryList).on('click', toggle);
-
+        var iframe = EE('iframe', {'$display' : 'none', 'className' : 'jdbc-sniffer-iframe', '@scrolling' : 'no'});
+        $('body').add(iframe);
+        var toggle = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
+        
         // append toolbar
         var queryCounterDiv = EE('div', { 'className' : 'jdbc-sniffer-query-count' }, sqlQueries);
         queryCounterDiv.on('click', toggle);
         $('body').add(queryCounterDiv);
+
+        // create iframe GUI
+
+        var iframeHtml = '//@@include("../dist/jdbcsniffer.iframe.html")';
+        var iframeDocument = iframe.get('contentWindow').document;
+        iframeDocument.open();
+        iframeDocument.write(iframeHtml);
+        iframeDocument.close();
+
+        var statementsTableBody = $(iframeDocument.getElementById('jdbc-sniffer-queries'));
+        $(iframeDocument.getElementById('jdbcsniffer-iframe-close')).on('click', toggle);
 
         incrementQueryCounter = function(numQueries) {
             // increment global counter
@@ -75,10 +88,14 @@
         loadQueries = function(url, requestDetailsUrl) {
             $.request('get', requestDetailsUrl)
                 .then(function (data, xhr) {
-                    var statementsTableBody = $('#jdbc-sniffer-queries');
-                    statementsTableBody.add(EE('tr',[
-                        EE('td', {'className' : 'col-md-12 success', '@colspan' : '2'}, url)
-                    ]));
+
+                    try {
+                        statementsTableBody.add(EE('tr',[
+                            EE('td', {'className' : 'col-md-12 success', '@colspan' : '2'}, url)
+                        ]));
+                    } catch (e) {
+                        console.log(e);
+                    }
                     var noQueriesRow = EE('tr',[
                         EE('td','No queries'),
                         EE('td','')
@@ -141,10 +158,16 @@
 
                         var ajaxUrl = document.createElement('a');
                         ajaxUrl.href = url;
+                        if ('' === ajaxUrl.protocol && '' === ajaxUrl.host) {
+                            ajaxUrl.protocol = location.protocol;
+                            ajaxUrl.host = location.host;
+                        }
 
                         var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
-                        var ajaxUrlLabel = (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
-                            ajaxUrl.pathname + ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
+                        var ajaxUrlLabel = 
+                            (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
+                            (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) + 
+                            ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
 
                         loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
                     }
