@@ -1,27 +1,14 @@
-.jdbc-sniffer-ui * {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-.jdbc-sniffer-ui {
-	//@import (less) "../bower_components/bootstrap/dist/css/bootstrap.css";
+.jdbc-sniffer-iframe {
+	border: 0;
+	margin: auto;
 	width: 100%;
-	height: 100%;
-	left: 0px;
-	top: 0px;
+	height: 95%;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
 	position: fixed;
 	z-index:9999999991;
-}
-
-.jdbc-sniffer-ui > .container {
-	height: 100%;
-	padding-top: 25px;
-	padding-bottom: 25px;
-	padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
 
 	@media (min-width: 768px) {
 	    width: 750px;
@@ -34,83 +21,6 @@
 	@media (min-width: 1200px) {
 	    width: 1170px;
 	}
-
-}
-
-.jdbc-sniffer-ui > .container > .panel {
-	height: 100%;
-}
-
-.jdbc-sniffer-ui .panel {
-    background-color: #fff;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.05);
-    box-shadow: 0 1px 1px rgba(0,0,0,0.05);
-}
-
-.jdbc-sniffer-ui .panel-info {
-    border-color: #bce8f1;
-}
-
-.jdbc-sniffer-ui .panel-heading {
-    padding: 10px 15px;
-    border-bottom: 1px solid transparent;
-    border-top-left-radius: 3px;
-    border-top-right-radius: 3px;
-}
-
-.jdbc-sniffer-ui button.close {
-	-webkit-appearance: none;
-    padding: 0;
-    cursor: pointer;
-    background: transparent;
-    border: 0;
-    float: right;
-    font-size: 21px;
-    font-weight: bold;
-    line-height: 1;
-    color: #000;
-    text-shadow: 0 1px 0 #fff;
-    filter: alpha(opacity=20);
-    opacity: .2;
-}
-
-.jdbc-sniffer-ui .panel-title {
-    box-sizing: border-box;
-	color: rgb(49, 112, 143);
-	display: block;
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	font-size: 16px;
-	font-weight: 500;
-	height: 17px;
-	line-height: 17.6px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	margin-right: 0px;
-	margin-top: 0px;
-	text-rendering: optimizeLegibility;
-	width: 1108px;
-}
-
-.jdbc-sniffer-ui .panel-info>.panel-heading {
-    color: #31708f;
-    background-color: #d9edf7;
-    border-color: #bce8f1;
-}
-
-.jdbc-sniffer-ui iframe.jdbc-sniffer-iframe {
-	border: 0;
-	width: 100%;
-	height: 100%;
-}
-
-.jdbc-sniffer-ui .panel-footer {
-    padding: 10px 15px;
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
-    border-bottom-right-radius: 3px;
-    border-bottom-left-radius: 3px;
 }
 
 .jdbc-sniffer-query-count {
@@ -128,8 +38,8 @@
 	font-size: 16px !important;
     line-height: normal !important;
 	background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADAklEQVRIibWWzWscdRzGP59hCEGWEEIstZYQQntICbnqxYuI4E0EPcQ/QQ9eJd7s4lEEUfCil+5JL8WLJ98u6qmEkMUXqgQsNYRYllJKCPN4mNmd2aTZouBv2d1nZn6/5/v6fHcFGOxdB10GNoCNwFXCKuSiupRkAZxTCpICrCLHkJFwGDgQ94FfgT1gl3Bn69o2Dvb6a8i7wAvAcqCQdgXw3+FKOAK+S/J2ibwBbI0JTx/yFB5fzMAFYRl5Rb1dAkXX3RBE7IQxHVFqsm6I52BhvpyKT3CK7uxy4vLZ3DwKFy3fKc/OWWk2pXnNxAkFUJFuMrvRnv1sTraXM7BIAXyPHpzNXxvnNBYUdTbGO8DXAtwYXr8sPg88B2wCVwJLj0rvjHUI/ELYQb4Fvtla377rYNhfS3L4+rV3Rt3dg2G/l3DRWhs9pSR1zRIq5RgYEY6Qg6317fvd8zeG/UVh2cGw/wHwMuGHmB/F3YQ/lFGSh8ix8QSppitkAZTAXMK8spiwhmwIz0CeBT8vSUBXkBXxNQBrspFwL/AAeUA4QaqQohZfSuITSk+zkLCgtppCEooSrcZOpS1oEVgUF22aoyOVutQJ2FQntMKcbK7FWkITuh3LnVym86yma1xoGGdi6jExKU7bKZnyeMr7tN+PxTAqgfeAv0heRTeSLE+8bFg7UbdpoXtzgquQA3UX+CLJZyVwAnwEfpKwhF4CrggrwFPAEtID5gllasGfBB4KI+Ao+CdhX/lNvdu0bqWWJeRN8GnkK+En4NbW+vYt/sMa7PVBFjEvgi8BvzsY9t8H3mpGdYXuQ24b9pFDwt/gCDkmnDRcZcic2kvyJHihbvOsES7VI0iAD8uJ+TqHhbAaXG1SQWwfT+7RGeu2Az6d35E05eoI43/oImsDx2OTCfWYjQ1uzHVw3UVjS4/DVAXwKeRL5F7trnVamvdEaGM8FqKeg6kCRyQ3gY8FGAz7BeEysAnZRK9St+kFYAno0aSzHl0h9QC8b012AOyjPwM7wM74b8s/Owp6BPc7ajsAAAAASUVORK5CYII=);
-}
 
-.jdbc-sniffer-query-count:hover {
-	cursor: pointer;
+	&:hover {
+		cursor: pointer;
+	}
 }
