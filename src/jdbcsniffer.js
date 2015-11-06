@@ -54,7 +54,7 @@
 
         // create main GUI
 
-        var iframe = EE('iframe', {'$display' : 'none', 'className' : 'jdbc-sniffer-iframe'});
+        var iframe = EE('iframe', {'$display' : 'none', 'className' : 'jdbc-sniffer-iframe', '@scrolling' : 'no'});
         $('body').add(iframe);
         var toggle = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         
@@ -164,8 +164,10 @@
                         }
 
                         var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
-                        var ajaxUrlLabel = (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
-                            ajaxUrl.pathname + ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
+                        var ajaxUrlLabel = 
+                            (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
+                            (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) + 
+                            ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
 
                         loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
                     }

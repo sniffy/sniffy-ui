@@ -100,7 +100,6 @@ module.exports = function (grunt) {
                     minifyCSS: true
                 },
                 files: {
-                    'dist/jdbcsniffer.html': 'src/jdbcsniffer.html',
                     'dist/jdbcsniffer.iframe.html': 'src/jdbcsniffer.iframe.html'
                 }
             }
