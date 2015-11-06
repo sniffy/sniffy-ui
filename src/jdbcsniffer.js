@@ -50,18 +50,11 @@
         var sqlQueries = snifferElement.get('%sql-queries');
 
         // inject stylesheet
-        var snifferStyleHref = baseUrl + 'jdbcsniffer.css';
-        $('head').add(EE('link', {
-            '@rel' : 'stylesheet',
-            '@type' : 'text/css',
-            '@href' : snifferStyleHref,
-            '@media' : 'all'
-        }));
+        $('head').add(EE('style', '//@@include("../dist/jdbcsniffer.css")'));
 
         // create main GUI
 
         var iframe = EE('iframe', {'$display' : 'none', 'className' : 'jdbc-sniffer-iframe'});
-
         $('body').add(iframe);
         var toggle = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         
@@ -165,6 +158,10 @@
 
                         var ajaxUrl = document.createElement('a');
                         ajaxUrl.href = url;
+                        if ('' === ajaxUrl.protocol && '' === ajaxUrl.host) {
+                            ajaxUrl.protocol = location.protocol;
+                            ajaxUrl.host = location.host;
+                        }
 
                         var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
                         var ajaxUrlLabel = (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
