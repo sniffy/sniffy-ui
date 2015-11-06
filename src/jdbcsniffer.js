@@ -60,15 +60,11 @@
 
         // create main GUI
 
-        var queryList = HTML(
-            '//@@include("../dist/jdbcsniffer.html")'
-        );
+        var iframe = EE('iframe', {'$display' : 'none', 'className' : 'jdbc-sniffer-iframe'});
 
-        $('body').add(queryList);
-        var toggle = queryList.toggle({'$display': 'none'}, {'$display': 'block'});
+        $('body').add(iframe);
+        var toggle = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         
-        //$('.jdbc-sniffer-iframe').set('@src', baseUrl + 'jdbcsniffer.iframe.html');
-
         // append toolbar
         var queryCounterDiv = EE('div', { 'className' : 'jdbc-sniffer-query-count' }, sqlQueries);
         queryCounterDiv.on('click', toggle);
@@ -77,7 +73,7 @@
         // create iframe GUI
 
         var iframeHtml = '//@@include("../dist/jdbcsniffer.iframe.html")';
-        var iframeDocument = $('.jdbc-sniffer-iframe').get('contentWindow').document;
+        var iframeDocument = iframe.get('contentWindow').document;
         iframeDocument.open();
         iframeDocument.write(iframeHtml);
         iframeDocument.close();
