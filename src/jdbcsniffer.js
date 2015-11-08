@@ -71,6 +71,8 @@
         iframeDocument.write(iframeHtml);
         iframeDocument.close();
 
+        $(iframeDocument.getElementsByTagName('head')).add(EE('style', '//@@include("../dist/bootstrap.embedded.css")'));
+
         var statementsTableBody = $(iframeDocument.getElementById('jdbc-sniffer-queries'));
         $(iframeDocument.getElementById('jdbcsniffer-iframe-close')).on('click', toggle);
 
@@ -107,10 +109,12 @@
                         } else {
                             for (var i = 0; i < statements.length; i++) {
                                 var statement = statements[i];
+                                var codeEl;
                                 statementsTableBody.add(EE('tr',[
-                                    EE('td',statement.query),
+                                    EE('td',[EE('div',[codeEl = EE('code',{'@class':'language-sql'},statement.query)])]),
                                     EE('td',statement.time)
                                 ]));
+                                iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                             }
                         }
                     } else if (xhr.status === 204) {
