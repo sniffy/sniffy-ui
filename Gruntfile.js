@@ -157,5 +157,6 @@ module.exports = function (grunt) {
 
     // Default task
     grunt.registerTask('default', ['concat', 'imageEmbed', 'htmlmin', 'less', 'jshint', 'includereplace', 'uglify', 'copy']);
+    grunt.registerTask('travis', ['default']);
 };
 
