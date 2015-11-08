@@ -3,4 +3,3 @@ node_js:
   - "4.1"
 before_install: npm install -g grunt-cli
 install: npm install && bower install
-before_script: grunt travis
