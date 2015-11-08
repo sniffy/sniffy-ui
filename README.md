@@ -1,5 +1,7 @@
-# jdbc-sniffer-ui
-UI for JDBC Sniffer
+[![Build Status](https://travis-ci.org/sniffyio/sniffy-ui.svg?branch=develop)](https://travis-ci.org/sniffyio/sniffy-ui)
+
+# sniffy-ui
+Sniffy UI 
 
 ## Building
 
