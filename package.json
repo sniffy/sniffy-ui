@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/bedrin/jdbc-sniffer-ui.git"
   },
+  "scripts": {
+    "test": "grunt travis"
+  }
   "dependencies": {
     "express": "^4.13.3"
   },
