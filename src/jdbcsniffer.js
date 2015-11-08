@@ -109,10 +109,12 @@
                         } else {
                             for (var i = 0; i < statements.length; i++) {
                                 var statement = statements[i];
+                                var codeEl;
                                 statementsTableBody.add(EE('tr',[
-                                    EE('td',statement.query),
+                                    EE('td',[EE('div',[codeEl = EE('code',{'@class':'language-sql'},statement.query)])]),
                                     EE('td',statement.time)
                                 ]));
+                                iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                             }
                         }
                     } else if (xhr.status === 204) {
