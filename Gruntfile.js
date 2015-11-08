@@ -16,12 +16,6 @@ module.exports = function (grunt) {
                 cwd: 'dist/',
                 src: '**',
                 dest: 'mock/'
-            },
-            libs: {
-                expand: true,
-                cwd: 'bower_components/bootstrap/dist/',
-                src: '**',
-                dest: 'dist/bootstrap/'
             }
         },
         concat: {
@@ -126,7 +120,7 @@ module.exports = function (grunt) {
             },
             htmlmin: {
                 files: 'src/*.html',
-                tasks: ['htmlmin:dist','copy:libs','jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:mock']
+                tasks: ['htmlmin:dist','jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:mock']
             },
             src: {
                 files: 'src/*.js',

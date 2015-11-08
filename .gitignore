@@ -27,7 +27,3 @@ build/Release
 node_modules
 
 bower_components
-
-dist
-
-mock
