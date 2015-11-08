@@ -38,7 +38,11 @@ module.exports = function (grunt) {
             dist: {
                 options: {
                   prefix: '//@@',
-                  suffix: ''
+                  suffix: '',
+                  processIncludeContents: function(includeContents, localVars, filePath) {
+                    return filePath.endsWith('.js') ? includeContents : 
+                      includeContents.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, " ");
+                  }
                 },
                 src: 'dist/jdbcsniffer.js',
                 dest: 'dist/jdbcsniffer.js'
@@ -85,7 +89,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                  "dist/jdbcsniffer.css": "src/jdbcsniffer.less" // destination file and source file
+                  "dist/jdbcsniffer.css": "src/jdbcsniffer.less"
                 }
             }
         },
@@ -96,18 +100,27 @@ module.exports = function (grunt) {
             dist: {
                 options: {
                     removeComments: true,
-                    collapseWhitespace: true,
-                    minifyCSS: true
+                    collapseWhitespace: true
                 },
                 files: {
                     'dist/jdbcsniffer.iframe.html': 'src/jdbcsniffer.iframe.html'
                 }
             }
         },
+        imageEmbed: {
+            dist: {
+              src: [ "bower_components/bootstrap/dist/css/bootstrap.min.css" ],
+              dest: "dist/bootstrap.embedded.css",
+              options: {
+                deleteAfterEncoding : false,
+                preEncodeCallback: function () { return true; }
+              }
+            }
+          },
         watch: {
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
-                tasks: ['jshint:gruntfile']
+                tasks: ['jshint:gruntfile', 'concat', 'htmlmin', 'less', 'jshint', 'includereplace', 'uglify', 'copy']
             },
             htmlmin: {
                 files: 'src/*.html',
@@ -118,8 +131,8 @@ module.exports = function (grunt) {
                 tasks: ['jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:mock']
             },
             styles: {
-                files: ['src/*.less'], // which files to watch
-                tasks: ['less:dist','copy:mock'/*,'replace:dist'*/],
+                files: ['src/*.less'],
+                tasks: ['less:dist','copy:mock'],
                 options: {
                     nospawn: true
                 }
@@ -138,8 +151,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-notify');
+    grunt.loadNpmTasks("grunt-image-embed");
 
     // Default task
-    grunt.registerTask('default', ['concat', 'htmlmin', 'less', 'jshint', /*'qunit',*/ 'includereplace', 'uglify', 'copy']);
+    grunt.registerTask('default', ['concat', 'imageEmbed', 'htmlmin', 'less', 'jshint', 'includereplace', 'uglify', 'copy']);
 };
 
