@@ -100,7 +100,9 @@ module.exports = function (grunt) {
             dist: {
                 options: {
                     removeComments: true,
-                    collapseWhitespace: true
+                    collapseWhitespace: true,
+                    minifyCSS: true,
+                    minifyJS: true
                 },
                 files: {
                     'dist/jdbcsniffer.iframe.html': 'src/jdbcsniffer.iframe.html'
