@@ -22,6 +22,7 @@
   ],
   "dependencies": {
     "minified": "~2015.1.1",
-    "bootstrap": "~3.3.5"
+    "bootstrap": "~3.3.5",
+    "highlightjs": "~8.9.1"
   }
 }

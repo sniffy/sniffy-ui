@@ -14,18 +14,8 @@ module.exports = function (grunt) {
             mock: {
                 expand: true,
                 cwd: 'dist/',
-                src: '**',
+                src: ['jdbcsniffer.js','jdbcsniffer.min.js'],
                 dest: 'mock/'
-            }
-        },
-        concat: {
-            options: {
-                banner: '<%= banner %>',
-                stripBanners: true
-            },
-            dist: {
-                src: ['src/jdbcsniffer.js'],
-                dest: 'dist/jdbcsniffer.js'
             }
         },
         includereplace: {
@@ -38,8 +28,12 @@ module.exports = function (grunt) {
                       includeContents.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, " ");
                   }
                 },
-                src: 'dist/jdbcsniffer.js',
+                src: 'src/jdbcsniffer.js',
                 dest: 'dist/jdbcsniffer.js'
+            },
+            iframe: {
+                src: 'src/jdbcsniffer.iframe.html',
+                dest: 'build/jdbcsniffer.iframe.html'
             }
         },
         uglify: {
@@ -99,7 +93,7 @@ module.exports = function (grunt) {
                     minifyJS: true
                 },
                 files: {
-                    'dist/jdbcsniffer.iframe.html': 'src/jdbcsniffer.iframe.html'
+                    'dist/jdbcsniffer.iframe.html': 'build/jdbcsniffer.iframe.html'
                 }
             }
         },
@@ -116,15 +110,15 @@ module.exports = function (grunt) {
         watch: {
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
-                tasks: ['jshint:gruntfile', 'concat', 'htmlmin', 'less', 'jshint', 'includereplace', 'uglify', 'copy']
+                tasks: ['jshint:gruntfile', 'includereplace:iframe', 'htmlmin', 'less', 'jshint', 'includereplace:dist', 'uglify', 'copy']
             },
             htmlmin: {
                 files: 'src/*.html',
-                tasks: ['htmlmin:dist','jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:mock']
+                tasks: ['includereplace:iframe','htmlmin:dist','jshint:dist','includereplace:dist','uglify:dist','copy:mock']
             },
             src: {
                 files: 'src/*.js',
-                tasks: ['jshint:dist','concat:dist','includereplace:dist','uglify:dist','copy:mock']
+                tasks: ['jshint:dist','includereplace:dist','uglify:dist','copy:mock']
             },
             styles: {
                 files: ['src/*.less'],
@@ -137,20 +131,18 @@ module.exports = function (grunt) {
     });
 
     // These plugins provide necessary tasks
-    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-qunit');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-include-replace');
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
-    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks("grunt-image-embed");
 
     // Default task
-    grunt.registerTask('default', ['concat', 'imageEmbed', 'htmlmin', 'less', 'jshint', 'includereplace', 'uglify', 'copy']);
+    grunt.registerTask('default', ['imageEmbed', 'includereplace:iframe', 'htmlmin', 'less', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
     grunt.registerTask('travis', ['default']);
 };
 

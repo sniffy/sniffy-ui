@@ -27,3 +27,9 @@ build/Release
 node_modules
 
 bower_components
+
+build
+
+.idea
+
+COMMIT_MSG
