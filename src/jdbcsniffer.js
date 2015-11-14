@@ -41,6 +41,17 @@
 
     $(function(){
 
+        var fixZIndex = function() {
+            $('body *').filter(function(el, index){ 
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'jdbc-sniffer-query-count'; 
+            }).set('$zIndex','2147483646');
+        };
+        fixZIndex();
+        window.setTimeout(fixZIndex, 10);
+        window.setTimeout(fixZIndex, 100);
+        window.setTimeout(fixZIndex, 1000);
+        window.setTimeout(fixZIndex, 2000);
+
         var snifferHeaderElement = $('#jdbc-sniffer-header');
         var requestId = snifferHeaderElement.get('%request-id');
         var snifferScriptSrc = snifferHeaderElement.get('@src');
