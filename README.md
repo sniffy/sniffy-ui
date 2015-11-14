@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/sniffyio/sniffy-ui.svg?branch=develop)](https://travis-ci.org/sniffyio/sniffy-ui)
+[![Dependency Status](https://david-dm.org/sniffyio/sniffy-ui.svg)](https://david-dm.org/sniffyio/sniffy-ui)
+[![devDependency Status](https://david-dm.org/sniffyio/sniffy-ui/dev-status.svg)](https://david-dm.org/sniffyio/sniffy-ui#info=devDependencies)
 
 # sniffy-ui
 Sniffy UI 
