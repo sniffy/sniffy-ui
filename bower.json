@@ -3,7 +3,7 @@
   "homepage": "http://sniffy.io",
   "repository": {
     "type": "git",
-    "url": "git@github.com:sniffyio/sniffy-ui.git"
+    "url": "git@github.com:sniffy/sniffy-ui.git"
   },
   "authors": [
     "bedrin <Dmitry.Bedrin@gmail.com>"
