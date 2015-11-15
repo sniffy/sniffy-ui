@@ -1,5 +1,9 @@
-# jdbc-sniffer-ui
-UI for JDBC Sniffer
+[![Build Status](https://travis-ci.org/sniffy/sniffy-ui.svg?branch=develop)](https://travis-ci.org/sniffy/sniffy-ui)
+[![Dependency Status](https://david-dm.org/sniffy/sniffy-ui.svg)](https://david-dm.org/sniffy/sniffy-ui)
+[![devDependency Status](https://david-dm.org/sniffyii/dev-status.svg)](https://david-dm.org/sniffy/sniffy-ui#info=devDependencies)
+
+# sniffy-ui
+Sniffy UI 
 
 ## Building
 
@@ -21,4 +25,4 @@ grunt watch
 node index.js
 ```
 
-Now open [http://localhost:3000/dist/mock.html](http://localhost:3000/dist/mock.html) in your browser and have fun!
+Now open [http://localhost:3000/mock/mock.html](http://localhost:3000/mock/mock.html) in your browser and have fun!
