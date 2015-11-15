@@ -61,7 +61,7 @@
         var sqlQueries = snifferElement.get('%sql-queries');
 
         // inject stylesheet
-        $('head').add(EE('style', '//@@include("../dist/jdbcsniffer.css")'));
+        $('head').add(EE('style', '//@@include("../build/jdbcsniffer.css")'));
 
         // create main GUI
 
@@ -76,7 +76,7 @@
 
         // create iframe GUI
 
-        var iframeHtml = '//@@include("../dist/jdbcsniffer.iframe.html")';
+        var iframeHtml = '//@@include("../build/jdbcsniffer.iframe.html")';
         var iframeDocument = iframe.get('contentWindow').document;
         iframeDocument.open();
         iframeDocument.write(iframeHtml);
