@@ -1,10 +1,31 @@
 ;(function(){
 
+    /*jshint unused:false*/
+
+    // require/define basic support
+
+    var defs = {};
+
+    function require(name) {
+        return defs[name];
+    }
+
+    function define(name, f) {
+        defs[name] = defs[name] || f(require);
+    }
+
+    // include libraries: minified.js
+
     //@@include('../bower_components/minified/dist/minified.js')
+
     var MINI = require('minified');
     var $ = MINI.$, EE = MINI.EE, HTML = MINI.HTML;
 
-    window.jdbcSniffer = {numberOfSqlQueries : 0};
+    // register jdbcSniffer in global scope
+
+    window.jdbcSniffer = {
+        numberOfSqlQueries : 0
+    };
 
     var ajaxRequests = [];
     var loadQueries = function(url, requestId) {
@@ -12,40 +33,57 @@
     };
 
     var incrementQueryCounter = function(numQueries) {
+        // increment global counter
         window.jdbcSniffer.numberOfSqlQueries += numQueries;
     };
 
+    // setup sniffer UI on dom ready
+
     $(function(){
+
+        var fixZIndex = function() {
+            $('body *').filter(function(el, index){ 
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'jdbc-sniffer-query-count'; 
+            }).set('$zIndex','2147483646');
+        };
+        fixZIndex();
+        window.setTimeout(fixZIndex, 10);
+        window.setTimeout(fixZIndex, 100);
+        window.setTimeout(fixZIndex, 1000);
+        window.setTimeout(fixZIndex, 2000);
+
+        var snifferHeaderElement = $('#jdbc-sniffer-header');
+        var requestId = snifferHeaderElement.get('%request-id');
+        var snifferScriptSrc = snifferHeaderElement.get('@src');
+        var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
         var snifferElement = $('#jdbc-sniffer');
         var sqlQueries = snifferElement.get('%sql-queries');
-        var requestId = snifferElement.get('%request-id');
-        var snifferScriptSrc = snifferElement.get('@src');
-
-        var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
         // inject stylesheet
-        var snifferStyleHref = baseUrl + 'jdbcsniffer.css';
-        $('head').add(EE('link', {
-            '@rel' : 'stylesheet',
-            '@type' : 'text.css',
-            '@href' : snifferStyleHref,
-            '@media' : 'all'
-        }));
+        $('head').add(EE('style', '//@@include("../build/jdbcsniffer.css")'));
 
         // create main GUI
-        var queryList = HTML(
-            '//@@include("../dist/jdbcsniffer.html")'
-        );
 
-        $('body').add(queryList);
-        var toggle = queryList.toggle({'$display': 'none'}, {'$display': 'block'});
-        $('button.close', queryList).on('click', toggle);
-
+        var iframe = EE('iframe', {'$display' : 'none', 'className' : 'jdbc-sniffer-iframe', '@scrolling' : 'no'});
+        $('body').add(iframe);
+        var toggle = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
+        
         // append toolbar
         var queryCounterDiv = EE('div', { 'className' : 'jdbc-sniffer-query-count' }, sqlQueries);
         queryCounterDiv.on('click', toggle);
         $('body').add(queryCounterDiv);
+
+        // create iframe GUI
+
+        var iframeHtml = '//@@include("../build/jdbcsniffer.iframe.html")';
+        var iframeDocument = iframe.get('contentWindow').document;
+        iframeDocument.open();
+        iframeDocument.write(iframeHtml);
+        iframeDocument.close();
+
+        var statementsTableBody = $(iframeDocument.getElementById('jdbc-sniffer-queries'));
+        $(iframeDocument.getElementById('jdbcsniffer-iframe-close')).on('click', toggle);
 
         incrementQueryCounter = function(numQueries) {
             // increment global counter
@@ -56,15 +94,19 @@
         incrementQueryCounter(parseInt(sqlQueries));
 
         // request data
-        loadQueries(location.pathname, requestId);
+        loadQueries(location.pathname, baseUrl + 'request/' + requestId);
 
-        loadQueries = function(url, requestId) {
-            $.request('get', baseUrl + 'request/' + requestId)
+        loadQueries = function(url, requestDetailsUrl) {
+            $.request('get', requestDetailsUrl)
                 .then(function (data, xhr) {
-                    var statementsTableBody = $('#jdbc-sniffer-queries');
-                    statementsTableBody.add(EE('tr',[
-                        EE('td', {'className' : 'col-md-12 success', '@colspan' : '2'}, url)
-                    ]));
+
+                    try {
+                        statementsTableBody.add(EE('tr',[
+                            EE('td', {'className' : 'col-md-12 success', '@colspan' : '2'}, url)
+                        ]));
+                    } catch (e) {
+                        console.log(e);
+                    }
                     var noQueriesRow = EE('tr',[
                         EE('td','No queries'),
                         EE('td','')
@@ -76,10 +118,12 @@
                         } else {
                             for (var i = 0; i < statements.length; i++) {
                                 var statement = statements[i];
+                                var codeEl;
                                 statementsTableBody.add(EE('tr',[
-                                    EE('td',statement.query),
+                                    EE('td',[EE('div',[codeEl = EE('code',{'@class':'language-sql'},statement.query)])]),
                                     EE('td',statement.time)
                                 ]));
+                                iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                             }
                         }
                     } else if (xhr.status === 204) {
@@ -122,10 +166,23 @@
                     var sqlQueries = self.getResponseHeader("X-Sql-Queries");
                     if (sqlQueries && parseInt(sqlQueries) > 0) {
                         incrementQueryCounter(parseInt(sqlQueries));
-                        var requestId = self.getResponseHeader("X-Request-Id");
-                        url = url.charAt(0) === '/' ? url : 
-                            location.pathname.substring(0, location.pathname.lastIndexOf('/') + 1) + url;
-                        loadQueries(method + ' ' + url, requestId);
+
+                        var xRequestDetailsHeader = self.getResponseHeader("X-Request-Details"); // details url relative to ajax original request
+
+                        var ajaxUrl = document.createElement('a');
+                        ajaxUrl.href = url;
+                        if ('' === ajaxUrl.protocol && '' === ajaxUrl.host) {
+                            ajaxUrl.protocol = location.protocol;
+                            ajaxUrl.host = location.host;
+                        }
+
+                        var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
+                        var ajaxUrlLabel = 
+                            (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
+                            (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) + 
+                            ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
+
+                        loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
                     }
                 }
                 
@@ -149,4 +206,4 @@
         };
     })(XMLHttpRequest);
 
-}());
+}.apply({}));

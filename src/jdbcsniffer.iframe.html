@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>JDBC Sniffer</title>
+	<style>
+		html, body {height: 100%;width: 100%;margin: 0;padding: 0;}
+		code { background: inherit !important;}
+
+		@@include('../bower_components/highlightjs/styles/tomorrow.css')
+		@@include('../build/bootstrap.embedded.css')
+	</style>
+</head>
+<body>
+	<div class="panel panel-info" style="height: 100%; margin: 0">
+		<div class="panel-heading" style="position:absolute; top:0px; left:0px; height:38px; right:0px;overflow:hidden;">
+			<div style="float: right">
+				<a href="javascript:void(0);" class="clipboard" data-clipboard-target="#jdbc-sniffer-queries"><span class="glyphicon glyphicon-copy" aria-hidden="true"></span></a>
+				<a href="javascript:void(0);" id="jdbcsniffer-iframe-close"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+			</div>	
+			<h3 class="panel-title">Executed Queries</h3>
+		</div>
+		<div style="position:absolute; top:38px; bottom:38px; left:0px; right:0px; overflow:auto;">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="col-md-10">Query</th>
+						<th class="col-md-2" title="Elapsed Time (millis)">Time</th>
+					</tr>
+				</thead>
+				<tbody id="jdbc-sniffer-queries">
+				</tbody>
+			</table>
+		</div>
+		<div class="panel-footer" style="position:absolute; bottom:1px; height:38px; left:1px; right:1px; overflow:hidden;">
+			Powered by <a href="http://sniffy.io/" target="_blank">Sniffy</a>
+		</div>
+	</div>
+	<script>
+		@@include('../vendor/highlight.js')
+		@@include('../bower_components/clipboard/dist/clipboard.min.js')
+		new Clipboard('.clipboard');
+	</script>	
+</body>
+</html>
