@@ -82,8 +82,6 @@
         iframeDocument.write(iframeHtml);
         iframeDocument.close();
 
-        $(iframeDocument.getElementsByTagName('head')).add(EE('style', '//@@include("../dist/bootstrap.embedded.css")'));
-
         var statementsTableBody = $(iframeDocument.getElementById('jdbc-sniffer-queries'));
         $(iframeDocument.getElementById('jdbcsniffer-iframe-close')).on('click', toggle);
 
