@@ -77,7 +77,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                  "dist/jdbcsniffer.css": "src/jdbcsniffer.less"
+                  "build/jdbcsniffer.css": "src/jdbcsniffer.less"
                 }
             }
         },
@@ -93,14 +93,14 @@ module.exports = function (grunt) {
                     minifyJS: true
                 },
                 files: {
-                    'dist/jdbcsniffer.iframe.html': 'build/jdbcsniffer.iframe.html'
+                    'build/jdbcsniffer.iframe.html': 'build/jdbcsniffer.iframe.html'
                 }
             }
         },
         imageEmbed: {
             dist: {
               src: [ "bower_components/bootstrap/dist/css/bootstrap.min.css" ],
-              dest: "dist/bootstrap.embedded.css",
+              dest: "build/bootstrap.embedded.css",
               options: {
                 deleteAfterEncoding : false,
                 preEncodeCallback: function () { return true; }
