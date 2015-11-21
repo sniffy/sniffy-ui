@@ -11,7 +11,7 @@
   "description": "Sniffy - next generation profiler",
   "keywords": "profiler, monitoring, jdbc",
   "main": "./dist/sniffy.js",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "moduleType": "globals",
   "ignore": [
     "**/.*",
