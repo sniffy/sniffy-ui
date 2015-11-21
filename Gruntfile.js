@@ -10,11 +10,16 @@ module.exports = function (grunt) {
             '* Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
             ' Licensed <%= pkg.license %> */\n',
         // Task configuration
+        clean: {
+            build: {
+                src: ['build','dist','mock/sniffy.js','mock/sniffy.min.js']
+            }
+        },
         copy: {
             mock: {
                 expand: true,
                 cwd: 'dist/',
-                src: ['jdbcsniffer.js','jdbcsniffer.min.js'],
+                src: ['sniffy.js','sniffy.min.js'],
                 dest: 'mock/'
             }
         },
@@ -28,12 +33,12 @@ module.exports = function (grunt) {
                       includeContents.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, " ");
                   }
                 },
-                src: 'src/jdbcsniffer.js',
-                dest: 'dist/jdbcsniffer.js'
+                src: 'src/sniffy.js',
+                dest: 'dist/sniffy.js'
             },
             iframe: {
-                src: 'src/jdbcsniffer.iframe.html',
-                dest: 'build/jdbcsniffer.iframe.html'
+                src: 'src/sniffy.iframe.html',
+                dest: 'build/sniffy.iframe.html'
             }
         },
         uglify: {
@@ -41,8 +46,8 @@ module.exports = function (grunt) {
                 banner: '<%= banner %>'
             },
             dist: {
-                src: 'dist/jdbcsniffer.js',
-                dest: 'dist/jdbcsniffer.min.js'
+                src: 'dist/sniffy.js',
+                dest: 'dist/sniffy.min.js'
             }
         },
         jshint: {
@@ -77,7 +82,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                  "build/jdbcsniffer.css": "src/jdbcsniffer.less"
+                  "build/sniffy.css": "src/sniffy.less"
                 }
             }
         },
@@ -93,7 +98,7 @@ module.exports = function (grunt) {
                     minifyJS: true
                 },
                 files: {
-                    'build/jdbcsniffer.iframe.html': 'build/jdbcsniffer.iframe.html'
+                    'build/sniffy.iframe.html': 'build/sniffy.iframe.html'
                 }
             }
         },
@@ -140,9 +145,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-htmlmin');
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks("grunt-image-embed");
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
     // Default task
     grunt.registerTask('default', ['imageEmbed', 'includereplace:iframe', 'htmlmin', 'less', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
     grunt.registerTask('travis', ['default']);
+    grunt.registerTask('travis', ['clean:build']);
 };
 

@@ -21,9 +21,9 @@
     var MINI = require('minified');
     var $ = MINI.$, EE = MINI.EE, HTML = MINI.HTML;
 
-    // register jdbcSniffer in global scope
+    // register sniffy in global scope
 
-    window.jdbcSniffer = {
+    window.sniffy = {
         numberOfSqlQueries : 0
     };
 
@@ -34,7 +34,7 @@
 
     var incrementQueryCounter = function(numQueries) {
         // increment global counter
-        window.jdbcSniffer.numberOfSqlQueries += numQueries;
+        window.sniffy.numberOfSqlQueries += numQueries;
     };
 
     // setup sniffer UI on dom ready
@@ -43,7 +43,7 @@
 
         var fixZIndex = function() {
             $('body *').filter(function(el, index){ 
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'jdbc-sniffer-query-count'; 
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'sniffy-query-count'; 
             }).set('$zIndex','2147483646');
         };
         fixZIndex();
@@ -52,43 +52,43 @@
         window.setTimeout(fixZIndex, 1000);
         window.setTimeout(fixZIndex, 2000);
 
-        var snifferHeaderElement = $('#jdbc-sniffer-header');
+        var snifferHeaderElement = $('#sniffy-header');
         var requestId = snifferHeaderElement.get('%request-id');
         var snifferScriptSrc = snifferHeaderElement.get('@src');
         var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
-        var snifferElement = $('#jdbc-sniffer');
+        var snifferElement = $('#sniffy');
         var sqlQueries = snifferElement.get('%sql-queries');
 
         // inject stylesheet
-        $('head').add(EE('style', '//@@include("../build/jdbcsniffer.css")'));
+        $('head').add(EE('style', '//@@include("../build/sniffy.css")'));
 
         // create main GUI
 
-        var iframe = EE('iframe', {'$display' : 'none', 'className' : 'jdbc-sniffer-iframe', '@scrolling' : 'no'});
+        var iframe = EE('iframe', {'$display' : 'none', 'className' : 'sniffy-iframe', '@scrolling' : 'no'});
         $('body').add(iframe);
         var toggle = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         
         // append toolbar
-        var queryCounterDiv = EE('div', { 'className' : 'jdbc-sniffer-query-count' }, sqlQueries);
+        var queryCounterDiv = EE('div', { 'className' : 'sniffy-query-count' }, sqlQueries);
         queryCounterDiv.on('click', toggle);
         $('body').add(queryCounterDiv);
 
         // create iframe GUI
 
-        var iframeHtml = '//@@include("../build/jdbcsniffer.iframe.html")';
+        var iframeHtml = '//@@include("../build/sniffy.iframe.html")';
         var iframeDocument = iframe.get('contentWindow').document;
         iframeDocument.open();
         iframeDocument.write(iframeHtml);
         iframeDocument.close();
 
-        var statementsTableBody = $(iframeDocument.getElementById('jdbc-sniffer-queries'));
-        $(iframeDocument.getElementById('jdbcsniffer-iframe-close')).on('click', toggle);
+        var statementsTableBody = $(iframeDocument.getElementById('sniffy-queries'));
+        $(iframeDocument.getElementById('sniffy-iframe-close')).on('click', toggle);
 
         incrementQueryCounter = function(numQueries) {
             // increment global counter
-            window.jdbcSniffer.numberOfSqlQueries += numQueries;
-            $('.jdbc-sniffer-query-count').fill(window.jdbcSniffer.numberOfSqlQueries);
+            window.sniffy.numberOfSqlQueries += numQueries;
+            $('.sniffy-query-count').fill(window.sniffy.numberOfSqlQueries);
         };
         
         incrementQueryCounter(parseInt(sqlQueries));
