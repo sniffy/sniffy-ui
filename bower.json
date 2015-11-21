@@ -10,7 +10,7 @@
   ],
   "description": "Sniffy - next generation profiler",
   "keywords": "profiler, monitoring, jdbc",
-  "main": "./dist/jdbcsniffer.js",
+  "main": "./dist/sniffy.js",
   "license": "BSD-3-Clause",
   "moduleType": "globals",
   "ignore": [
