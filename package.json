@@ -2,8 +2,8 @@
   "name": "sniffy-ui",
   "title": "UI for Sniffy",
   "author": "bedrin <Dmitry.Bedrin@gmail.com>",
-  "license": "BSD-3-Clause",
-  "version": "1.2.0",
+  "license": "MIT",
+  "version": "3.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/sniffy/sniffy-ui.git"
