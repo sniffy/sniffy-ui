@@ -102,7 +102,7 @@
 
                     try {
                         statementsTableBody.add(EE('tr',[
-                            EE('td', {'className' : 'col-md-12 success', '@colspan' : '2'}, url)
+                            EE('th', {'className' : 'col-md-12', '@colspan' : '2'}, url)
                         ]));
                     } catch (e) {
                         console.log(e);

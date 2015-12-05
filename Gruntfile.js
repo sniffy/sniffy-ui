@@ -82,7 +82,8 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                  "build/sniffy.css": "src/sniffy.less"
+                  "build/sniffy.css": "src/less/sniffy.less",
+                  "build/sniffy.iframe.css": "src/less/sniffy.iframe.less"
                 }
             }
         },
@@ -104,8 +105,8 @@ module.exports = function (grunt) {
         },
         imageEmbed: {
             dist: {
-              src: [ "bower_components/bootstrap/dist/css/bootstrap.min.css" ],
-              dest: "build/bootstrap.embedded.css",
+              src: [ "build/sniffy.iframe.css" ],
+              dest: "build/sniffy.iframe.embedded.css",
               options: {
                 deleteAfterEncoding : false,
                 preEncodeCallback: function () { return true; }
@@ -115,7 +116,7 @@ module.exports = function (grunt) {
         watch: {
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
-                tasks: ['jshint:gruntfile', 'includereplace:iframe', 'htmlmin', 'less', 'jshint', 'includereplace:dist', 'uglify', 'copy']
+                tasks: ['jshint:gruntfile', 'less', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy']
             },
             htmlmin: {
                 files: 'src/*.html',
@@ -148,7 +149,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
 
     // Default task
-    grunt.registerTask('default', ['imageEmbed', 'includereplace:iframe', 'htmlmin', 'less', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
+    grunt.registerTask('default', ['less', 'imageEmbed', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
     grunt.registerTask('travis', ['default']);
     grunt.registerTask('travis', ['clean:build']);
 };
