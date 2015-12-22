@@ -43,12 +43,14 @@
 
         var fixZIndex = function() {
             $('body *').filter(function(el, index){ 
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'sniffy-query-count'; 
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'sniffy-query-count' && $(el).get('$') !== 'sniffy-iframe'; 
             }).set('$zIndex','2147483646');
         };
         fixZIndex();
         window.setTimeout(fixZIndex, 10);
         window.setTimeout(fixZIndex, 100);
+        window.setTimeout(fixZIndex, 200);
+        window.setTimeout(fixZIndex, 500);
         window.setTimeout(fixZIndex, 1000);
         window.setTimeout(fixZIndex, 2000);
 
@@ -67,11 +69,13 @@
 
         var iframe = EE('iframe', {'$display' : 'none', 'className' : 'sniffy-iframe', '@scrolling' : 'no'});
         $('body').add(iframe);
-        var toggle = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
+        var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
+        var toggleMaximizedIframe = iframe.toggle('maximized');
         
         // append toolbar
         var queryCounterDiv = EE('div', { 'className' : 'sniffy-query-count' }, sqlQueries);
-        queryCounterDiv.on('click', toggle);
+        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'});
+        queryCounterDiv.on('click', toggleIframe);
         $('body').add(queryCounterDiv);
 
         // create iframe GUI
@@ -83,7 +87,19 @@
         iframeDocument.close();
 
         var statementsTableBody = $(iframeDocument.getElementById('sniffy-queries'));
-        $(iframeDocument.getElementById('sniffy-iframe-close')).on('click', toggle);
+        $(iframeDocument.getElementById('sniffy-iframe-close')).on('click', toggleIframe);
+
+        var toggleMaximizeIcon = $('span', $(iframeDocument.getElementById('sniffy-iframe-maximize'))).toggle(
+            {'$':'+glyphicon-resize-full -glyphicon-resize-small'},
+            {'$':'+glyphicon-resize-small -glyphicon-resize-full'}
+        );
+        var maximizeIframe = function() {
+            toggleIcon();
+            toggleMaximizedIframe();
+            toggleMaximizeIcon();
+        };
+
+        $(iframeDocument.getElementById('sniffy-iframe-maximize')).on('click', maximizeIframe);
 
         incrementQueryCounter = function(numQueries) {
             // increment global counter
