@@ -74,8 +74,12 @@
         
         // append toolbar
         var queryCounterDiv = EE('div', { 'className' : 'sniffy-query-count' }, sqlQueries);
-        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'});
-        queryCounterDiv.on('click', toggleIframe);
+        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'}); 
+        queryCounterDiv.on('click', function() {
+            toggleIframe();
+            toggleMaximizedIframe(false);
+            toggleMaximizeIcon(false);
+        });
         $('body').add(queryCounterDiv);
 
         // create iframe GUI
@@ -87,8 +91,12 @@
         iframeDocument.close();
 
         var statementsTableBody = $(iframeDocument.getElementById('sniffy-queries'));
-        $(iframeDocument.getElementById('sniffy-iframe-close')).on('click', toggleIframe);
+        $(iframeDocument.getElementById('sniffy-iframe-close')).on('click', function() {
+            toggleIframe();
+            toggleIcon(false);
+        });
 
+        // todo persist maximized state; use some storage to keep the state between browser launches
         var toggleMaximizeIcon = $('span', $(iframeDocument.getElementById('sniffy-iframe-maximize'))).toggle(
             {'$':'+glyphicon-resize-full -glyphicon-resize-small'},
             {'$':'+glyphicon-resize-small -glyphicon-resize-full'}
