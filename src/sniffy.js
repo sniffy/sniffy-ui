@@ -123,20 +123,17 @@
         loadQueries = function(url, requestDetailsUrl) {
             $.request('get', requestDetailsUrl)
                 .then(function (data, xhr) {
-
-                    try {
-                        statementsTableBody.add(EE('tr',[
-                            EE('th', {'className' : 'col-md-12', '@colspan' : '2'}, url)
-                        ]));
-                    } catch (e) {
-                        console.log(e);
-                    }
                     var noQueriesRow = EE('tr',[
                         EE('td','No queries'),
                         EE('td','')
                     ]);
+                    var stats = $.parseJSON(data);
+                    var statements = stats.executedQueries;
+                    statementsTableBody.add(EE('tr',[
+                            EE('th', {}, url),
+                            EE('th', {}, stats.time)
+                        ]));
                     if (xhr.status === 200) {
-                        var statements = $.parseJSON(data);
                         if (statements.length === 0) {
                             statementsTableBody.add(noQueriesRow);
                         } else {
@@ -150,7 +147,7 @@
                                 iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                             }
                         }
-                    } else if (xhr.status === 204) {
+                    } else {
                         statementsTableBody.add(noQueriesRow);
                     }
                 })

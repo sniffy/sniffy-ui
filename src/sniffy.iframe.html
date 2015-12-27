@@ -18,17 +18,19 @@
 			</div>	
 			<h3 class="panel-title">Executed Queries</h3>
 		</div>
-		<div style="position:absolute; top:38px; bottom:38px; left:0px; right:0px; overflow:auto;">
-			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th class="col-md-10">Query</th>
-						<th class="col-md-2" title="Elapsed Time (millis)">Time</th>
-					</tr>
-				</thead>
-				<tbody id="sniffy-queries">
-				</tbody>
-			</table>
+		<div style="position:absolute; top:38px; bottom:38px; left:0px; right:0px; overflow:auto;" class="nano" id="sniffy-queries-div">
+			<div class="nano-content">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th class="col-md-10">Query</th>
+							<th class="col-md-2" title="Elapsed Time (millis)">Time (ms)</th>
+						</tr>
+					</thead>
+					<tbody id="sniffy-queries">
+					</tbody>
+				</table>
+			</div>	
 		</div>
 		<div class="panel-footer" style="position:absolute; bottom:1px; height:38px; left:1px; right:1px; overflow:hidden;">
 			Powered by <a href="http://sniffy.io/" target="_blank">Sniffy</a>
@@ -37,7 +39,12 @@
 	<script>
 		@@include('../vendor/highlight.js')
 		@@include('../bower_components/clipboard/dist/clipboard.min.js')
+		@@include('../bower_components/jquery/dist/jquery.min.js')
+		@@include('../bower_components/nanoscroller/bin/javascripts/jquery.nanoscroller.min.js')
 		new Clipboard('.clipboard');
+		$(document).ready(function() {  
+	        $("#sniffy-queries-div").nanoScroller();
+	    });
 	</script>	
 </body>
 </html>
