@@ -1,4 +1,4 @@
-[
+{"time":42,"executedQueries":[
 {"query":"SELECT 1 FROM DUAL","time":300},
 {"query":"SELECT 1 FROM DUAL","time":300}
-]
+]}
