@@ -24,7 +24,8 @@
     // register sniffy in global scope
 
     window.sniffy = {
-        numberOfSqlQueries : 0
+        numberOfSqlQueries : 0,
+        statementsCounter : 0
     };
 
     var ajaxRequests = [];
@@ -138,14 +139,25 @@
                         if (statements.length === 0) {
                             statementsTableBody.add(noQueriesRow);
                         } else {
-                            var showStackClickHandler = function(i) {
+                            var showStackClickHandler = function(num) {
                                 return function () {
-                                    $(iframeDocument.getElementById('show-stack-' + i)).fill('test');
+                                    var showStackEl = $(iframeDocument.getElementById('show-stack-' + num));
+                                    var stackTraceEl = $(iframeDocument.getElementById('stackTrace-' + num));
+                                    if (showStackEl.is('.show-stack')) {
+                                        // show stack and toggle state
+                                        showStackEl.set('$', '-show-stack');
+                                        showStackEl.fill('Hide stack trace');
+                                        stackTraceEl.show();
+                                    } else {
+                                        showStackEl.set('$', '+show-stack');
+                                        showStackEl.fill('Show stack trace');
+                                        stackTraceEl.hide();
+                                    }
                                 };
                             };
                             for (var i = 0; i < statements.length; i++) {
                                 var statement = statements[i];
-                                var codeEl, stackEl;
+                                var codeEl, stackEl, statementId = ++window.sniffy.statementsCounter;
                                 // sql + elapsed time
                                 statementsTableBody.add(EE('tr',[
                                     EE('td',[EE('div',[codeEl = EE('code',{'@class':'language-sql'},statement.query)])]),
@@ -159,9 +171,9 @@
                                 statementsTableBody.add(EE('tr',[ 
                                     EE('td',{'@colspan': 2 }, [
                                         EE('div',[
-                                            EE('button', {'@class': 'btn btn-link btn-xs', '@id' :'show-stack-' + i}, 'Show stack')
-                                                .on('click', showStackClickHandler(i)),
-                                            stackEl = EE('code',{'@class':'java stackTrace-' + i},statement.stackTrace)])
+                                            EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + statementId}, 'Show stack trace')
+                                                .on('click', showStackClickHandler(statementId)),
+                                            stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stackTrace-' + statementId},statement.stackTrace)])
                                         ])
                                     ]));
                                 iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
