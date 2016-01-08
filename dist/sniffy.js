@@ -127,7 +127,7 @@
                     stackTraceEl.show();
                 } else {
                     showStackEl.set('$', '+show-stack');
-                    showStackEl.fill('Show stack trace');
+                    showStackEl.fill('Stack trace');
                     stackTraceEl.hide();
                 }
             };
@@ -166,18 +166,17 @@
                                 ]));
                                 iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                                 // stack trace
-                                if (!statement.stackTrace || statement.stackTrace.length === 0) {
-                                    statement.stackTrace = 'No stack trace available';
+                                if (statement.stackTrace && statement.stackTrace.length > 0) {
+                                    statementsTableBody.add(EE('tr',[ 
+                                        EE('td',{'@colspan': 2 }, [
+                                            EE('div',[
+                                                EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + statementId}, 'Stack trace')
+                                                    .on('click', showStackClickHandler(statementId)),
+                                                stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stackTrace-' + statementId},statement.stackTrace)])
+                                            ])
+                                        ]));
+                                    iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
                                 }
-                                statementsTableBody.add(EE('tr',[ 
-                                    EE('td',{'@colspan': 2 }, [
-                                        EE('div',[
-                                            EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + statementId}, 'Show stack trace')
-                                                .on('click', showStackClickHandler(statementId)),
-                                            stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stackTrace-' + statementId},statement.stackTrace)])
-                                        ])
-                                    ]));
-                                iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
                             }
                         }
                     } else {
