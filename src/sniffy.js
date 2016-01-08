@@ -115,7 +115,24 @@
             window.sniffy.numberOfSqlQueries += numQueries;
             $('.sniffy-query-count').fill(window.sniffy.numberOfSqlQueries);
         };
-        
+
+        var showStackClickHandler = function(num) {
+            return function () {
+                var showStackEl = $(iframeDocument.getElementById('show-stack-' + num));
+                var stackTraceEl = $(iframeDocument.getElementById('stackTrace-' + num));
+                if (showStackEl.is('.show-stack')) {
+                    // show stack and toggle state
+                    showStackEl.set('$', '-show-stack');
+                    showStackEl.fill('Hide stack trace');
+                    stackTraceEl.show();
+                } else {
+                    showStackEl.set('$', '+show-stack');
+                    showStackEl.fill('Show stack trace');
+                    stackTraceEl.hide();
+                }
+            };
+        };
+                            
         incrementQueryCounter(parseInt(sqlQueries));
 
         // request data
@@ -139,22 +156,6 @@
                         if (statements.length === 0) {
                             statementsTableBody.add(noQueriesRow);
                         } else {
-                            var showStackClickHandler = function(num) {
-                                return function () {
-                                    var showStackEl = $(iframeDocument.getElementById('show-stack-' + num));
-                                    var stackTraceEl = $(iframeDocument.getElementById('stackTrace-' + num));
-                                    if (showStackEl.is('.show-stack')) {
-                                        // show stack and toggle state
-                                        showStackEl.set('$', '-show-stack');
-                                        showStackEl.fill('Hide stack trace');
-                                        stackTraceEl.show();
-                                    } else {
-                                        showStackEl.set('$', '+show-stack');
-                                        showStackEl.fill('Show stack trace');
-                                        stackTraceEl.hide();
-                                    }
-                                };
-                            };
                             for (var i = 0; i < statements.length; i++) {
                                 var statement = statements[i];
                                 var codeEl, stackEl, statementId = ++window.sniffy.statementsCounter;
