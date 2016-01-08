@@ -148,9 +148,13 @@
                                 ]));
                                 iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                                 // stack trace
+                                if (!statement.stackTrace || statement.stackTrace.length === 0) {
+                                    statement.stackTrace = 'No stack trace available';
+                                }
                                 statementsTableBody.add(EE('tr',[ 
                                     EE('td',{'@colspan': 2 }, [
                                         EE('div',[
+                                            EE('button', {'@class': 'btn btn-link btn-xs'}, 'Show stack'),
                                             stackEl = EE('code',{'@class':'java'},statement.stackTrace)])
                                         ])
                                     ]));
