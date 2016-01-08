@@ -127,6 +127,7 @@
                         EE('td','No queries'),
                         EE('td','')
                     ]);
+                    iframe.get('contentWindow').hljs.configure({useBR: true});
                     var stats = $.parseJSON(data);
                     var statements = stats.executedQueries;
                     statementsTableBody.add(EE('tr',[
@@ -139,12 +140,21 @@
                         } else {
                             for (var i = 0; i < statements.length; i++) {
                                 var statement = statements[i];
-                                var codeEl;
+                                var codeEl, stackEl;
+                                // sql + elapsed time
                                 statementsTableBody.add(EE('tr',[
                                     EE('td',[EE('div',[codeEl = EE('code',{'@class':'language-sql'},statement.query)])]),
                                     EE('td',statement.time)
                                 ]));
                                 iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
+                                // stack trace
+                                statementsTableBody.add(EE('tr',[ 
+                                    EE('td',{'@colspan': 2 }, [
+                                        EE('div',[
+                                            stackEl = EE('code',{'@class':'java'},statement.stackTrace)])
+                                        ])
+                                    ]));
+                                iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
                             }
                         }
                     } else {
