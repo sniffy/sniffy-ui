@@ -119,7 +119,7 @@
         var showStackClickHandler = function(num) {
             return function () {
                 var showStackEl = $(iframeDocument.getElementById('show-stack-' + num));
-                var stackTraceEl = $(iframeDocument.getElementById('stackTrace-' + num));
+                var stackTraceEl = $(iframeDocument.getElementById('stack-trace-' + num));
                 if (showStackEl.is('.show-stack')) {
                     // show stack and toggle state
                     showStackEl.set('$', '-show-stack');
@@ -172,7 +172,7 @@
                                             EE('div',[
                                                 EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + statementId}, 'Stack trace')
                                                     .on('click', showStackClickHandler(statementId)),
-                                                stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stackTrace-' + statementId},statement.stackTrace)])
+                                                stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stack-trace-' + statementId},statement.stackTrace)])
                                             ])
                                         ]));
                                     iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
