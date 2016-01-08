@@ -138,6 +138,11 @@
                         if (statements.length === 0) {
                             statementsTableBody.add(noQueriesRow);
                         } else {
+                            var showStackClickHandler = function(i) {
+                                return function () {
+                                    $(iframeDocument.getElementById('show-stack-' + i)).fill('test');
+                                };
+                            };
                             for (var i = 0; i < statements.length; i++) {
                                 var statement = statements[i];
                                 var codeEl, stackEl;
@@ -154,8 +159,9 @@
                                 statementsTableBody.add(EE('tr',[ 
                                     EE('td',{'@colspan': 2 }, [
                                         EE('div',[
-                                            EE('button', {'@class': 'btn btn-link btn-xs'}, 'Show stack'),
-                                            stackEl = EE('code',{'@class':'java'},statement.stackTrace)])
+                                            EE('button', {'@class': 'btn btn-link btn-xs', '@id' :'show-stack-' + i}, 'Show stack')
+                                                .on('click', showStackClickHandler(i)),
+                                            stackEl = EE('code',{'@class':'java stackTrace-' + i},statement.stackTrace)])
                                         ])
                                     ]));
                                 iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
