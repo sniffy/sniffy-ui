@@ -43,8 +43,8 @@
     $(function(){
 
         var fixZIndex = function() {
-            $('body *').filter(function(el, index){ 
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'sniffy-query-count' && $(el).get('$') !== 'sniffy-iframe'; 
+            $('body *').filter(function(el, index){
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'sniffy-query-count' && $(el).get('$') !== 'sniffy-iframe';
             }).set('$zIndex','2147483646');
         };
         fixZIndex();
@@ -72,10 +72,10 @@
         $('body').add(iframe);
         var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         var toggleMaximizedIframe = iframe.toggle('maximized');
-        
+
         // append toolbar
         var queryCounterDiv = EE('div', { 'className' : 'sniffy-query-count' }, sqlQueries);
-        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'}); 
+        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'});
         queryCounterDiv.on('click', function() {
             toggleIframe();
             toggleMaximizedIframe(false);
@@ -132,7 +132,7 @@
                 }
             };
         };
-                            
+
         incrementQueryCounter(parseInt(sqlQueries));
 
         // request data
@@ -167,12 +167,14 @@
                                 iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                                 // stack trace
                                 if (statement.stackTrace && statement.stackTrace.length > 0) {
-                                    statementsTableBody.add(EE('tr',[ 
+                                    statement.stackTrace = statement.stackTrace.replace(/\r\n|\n/g, '\r\n');
+                                    statementsTableBody.add(EE('tr',[
                                         EE('td',{'@colspan': 2 }, [
                                             EE('div',[
                                                 EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + statementId}, 'Stack trace')
                                                     .on('click', showStackClickHandler(statementId)),
-                                                stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stack-trace-' + statementId},statement.stackTrace)])
+                                                stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stack-trace-' + statementId},statement.stackTrace
+                                                  )])
                                             ])
                                         ]));
                                     iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
@@ -197,23 +199,23 @@
 
     // Intercept ajax queries
     (function(XHR) {
-        
+
         var open = XHR.prototype.open;
         var send = XHR.prototype.send;
-        
+
         XHR.prototype.open = function(method, url, async, user, pass) {
             this._url = url;
             this._method = method;
             open.call(this, method, url, async, user, pass);
         };
-        
+
         XHR.prototype.send = function(data) {
             var self = this;
             var start;
             var oldOnReadyStateChange;
             var url = this._url;
             var method = this._method;
-            
+
             function onReadyStateChange() {
                 if(self.readyState === 4 /* complete */) {
                     var sqlQueries = self.getResponseHeader("X-Sql-Queries");
@@ -230,31 +232,31 @@
                         }
 
                         var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
-                        var ajaxUrlLabel = 
+                        var ajaxUrlLabel =
                             (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
-                            (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) + 
+                            (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
                             ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
 
                         loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
                     }
                 }
-                
+
                 if(oldOnReadyStateChange) {
                     oldOnReadyStateChange();
                 }
             }
-            
+
             if(!this.noIntercept) {
                 start = new Date();
-                
+
                 if(this.addEventListener) {
                     this.addEventListener("readystatechange", onReadyStateChange, false);
                 } else {
-                    oldOnReadyStateChange = this.onreadystatechange; 
+                    oldOnReadyStateChange = this.onreadystatechange;
                     this.onreadystatechange = onReadyStateChange;
                 }
             }
-            
+
             send.call(this, data);
         };
     })(XMLHttpRequest);
