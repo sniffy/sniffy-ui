@@ -26,6 +26,6 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-image-embed": "^0.3.3",
     "grunt-include-replace": "^3.0.0",
-    "grunt-notify": "^0.4.1"
+    "grunt-notify": "^0.4.5"
   }
 }
