@@ -43,8 +43,8 @@
     $(function(){
 
         var fixZIndex = function() {
-            $('body *').filter(function(el, index){ 
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'sniffy-query-count' && $(el).get('$') !== 'sniffy-iframe'; 
+            $('body *').filter(function(el, index){
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'sniffy-query-count' && $(el).get('$') !== 'sniffy-iframe';
             }).set('$zIndex','2147483646');
         };
         fixZIndex();
@@ -72,10 +72,10 @@
         $('body').add(iframe);
         var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         var toggleMaximizedIframe = iframe.toggle('maximized');
-        
+
         // append toolbar
         var queryCounterDiv = EE('div', { 'className' : 'sniffy-query-count' }, sqlQueries);
-        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'}); 
+        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'});
         queryCounterDiv.on('click', function() {
             toggleIframe();
             toggleMaximizedIframe(false);
@@ -116,23 +116,38 @@
             $('.sniffy-query-count').fill(window.sniffy.numberOfSqlQueries);
         };
 
-        var showStackClickHandler = function(num) {
+        var showStackClickHandler = function(num, linesCount) {
             return function () {
-                var showStackEl = $(iframeDocument.getElementById('show-stack-' + num));
-                var stackTraceEl = $(iframeDocument.getElementById('stack-trace-' + num));
+                var showStackEl = $(iframeDocument.getElementById('show-stack-' + num)),
+                    stackTraceEl = $(iframeDocument.getElementById('stack-trace-' + num)),
+                    showAllStackEl = $(iframeDocument.getElementById('show-all-stack-' + num));
                 if (showStackEl.is('.show-stack')) {
                     // show stack and toggle state
                     showStackEl.set('$', '-show-stack');
                     showStackEl.fill('Hide stack trace');
+                    if (linesCount >= 10) {
+                      stackTraceEl.set('$height', '190px');
+                      showAllStackEl.show();
+                    }
                     stackTraceEl.show();
                 } else {
                     showStackEl.set('$', '+show-stack');
                     showStackEl.fill('Stack trace');
                     stackTraceEl.hide();
+                    showAllStackEl.hide();
                 }
             };
         };
-                            
+
+        var showAllStackHandler = function(num) {
+            return function() {
+              var stackTraceEl = $(iframeDocument.getElementById('stack-trace-' + num));
+              var showAllStackEl = $(iframeDocument.getElementById('show-all-stack-' + num));
+              stackTraceEl.set('$height', 'auto');
+              showAllStackEl.hide();
+            };
+        };
+
         incrementQueryCounter(parseInt(sqlQueries));
 
         // request data
@@ -167,12 +182,25 @@
                                 iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                                 // stack trace
                                 if (statement.stackTrace && statement.stackTrace.length > 0) {
-                                    statementsTableBody.add(EE('tr',[ 
+                                    statement.stackTrace = statement.stackTrace.replace(/\r\n|\n/g, '\r\n');
+                                    var linesCount = statement.stackTrace.split('\r\n').length;
+                                    statementsTableBody.add(EE('tr',[
                                         EE('td',{'@colspan': 2 }, [
                                             EE('div',[
                                                 EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + statementId}, 'Stack trace')
-                                                    .on('click', showStackClickHandler(statementId)),
-                                                stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stack-trace-' + statementId},statement.stackTrace)])
+                                                    .on('click', showStackClickHandler(statementId, linesCount)),
+                                                stackEl = EE('code',
+                                                    {'@class':'java',
+                                                    '$display' : 'none',
+                                                    '$overflow' : 'hidden',
+                                                    '@id' : 'stack-trace-' + statementId},
+                                                    statement.stackTrace),
+                                                  EE('div', {'@class': 'show-all-stack', '$display' : 'none', '@id' :'show-all-stack-' + statementId},[
+                                                    EE('button', {
+                                                      '@class': 'btn btn-link btn-xs', '@id' :'show-all-stack-link-' + statementId
+                                                    }, 'Show all').on('click', showAllStackHandler(statementId))
+                                                  ])
+                                                ])
                                             ])
                                         ]));
                                     iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
@@ -197,23 +225,23 @@
 
     // Intercept ajax queries
     (function(XHR) {
-        
+
         var open = XHR.prototype.open;
         var send = XHR.prototype.send;
-        
+
         XHR.prototype.open = function(method, url, async, user, pass) {
             this._url = url;
             this._method = method;
             open.call(this, method, url, async, user, pass);
         };
-        
+
         XHR.prototype.send = function(data) {
             var self = this;
             var start;
             var oldOnReadyStateChange;
             var url = this._url;
             var method = this._method;
-            
+
             function onReadyStateChange() {
                 if(self.readyState === 4 /* complete */) {
                     var sqlQueries = self.getResponseHeader("X-Sql-Queries");
@@ -230,31 +258,31 @@
                         }
 
                         var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
-                        var ajaxUrlLabel = 
+                        var ajaxUrlLabel =
                             (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
-                            (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) + 
+                            (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
                             ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
 
                         loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
                     }
                 }
-                
+
                 if(oldOnReadyStateChange) {
                     oldOnReadyStateChange();
                 }
             }
-            
+
             if(!this.noIntercept) {
                 start = new Date();
-                
+
                 if(this.addEventListener) {
                     this.addEventListener("readystatechange", onReadyStateChange, false);
                 } else {
-                    oldOnReadyStateChange = this.onreadystatechange; 
+                    oldOnReadyStateChange = this.onreadystatechange;
                     this.onreadystatechange = onReadyStateChange;
                 }
             }
-            
+
             send.call(this, data);
         };
     })(XMLHttpRequest);
