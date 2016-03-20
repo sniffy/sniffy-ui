@@ -114,24 +114,37 @@
             // increment global counter
             window.sniffy.numberOfSqlQueries += numQueries;
             $('.sniffy-query-count').fill(window.sniffy.numberOfSqlQueries);
-            $('.sniffy-query-count').set('+sniffy-query-count-bold');
-            setTimeout(function() {$('.sniffy-query-count').set('-sniffy-query-count-bold');}, 400);
         };
 
-        var showStackClickHandler = function(num) {
+        var showStackClickHandler = function(num, linesCount) {
             return function () {
-                var showStackEl = $(iframeDocument.getElementById('show-stack-' + num));
-                var stackTraceEl = $(iframeDocument.getElementById('stack-trace-' + num));
+                var showStackEl = $(iframeDocument.getElementById('show-stack-' + num)),
+                    stackTraceEl = $(iframeDocument.getElementById('stack-trace-' + num)),
+                    showAllStackEl = $(iframeDocument.getElementById('show-all-stack-' + num));
                 if (showStackEl.is('.show-stack')) {
                     // show stack and toggle state
                     showStackEl.set('$', '-show-stack');
                     showStackEl.fill('Hide stack trace');
+                    if (linesCount >= 10) {
+                        stackTraceEl.set('$height', '190px');
+                        showAllStackEl.show();
+                    }
                     stackTraceEl.show();
                 } else {
                     showStackEl.set('$', '+show-stack');
                     showStackEl.fill('Stack trace');
                     stackTraceEl.hide();
+                    showAllStackEl.hide();
                 }
+            };
+        };
+
+        var showAllStackHandler = function(num) {
+            return function() {
+                var stackTraceEl = $(iframeDocument.getElementById('stack-trace-' + num));
+                var showAllStackEl = $(iframeDocument.getElementById('show-all-stack-' + num));
+                stackTraceEl.set('$height', 'auto');
+                showAllStackEl.hide();
             };
         };
 
@@ -151,9 +164,9 @@
                     var stats = $.parseJSON(data);
                     var statements = stats.executedQueries;
                     statementsTableBody.add(EE('tr',[
-                            EE('th', {}, url),
-                            EE('th', {}, stats.time)
-                        ]));
+                        EE('th', {}, url),
+                        EE('th', {}, stats.time)
+                    ]));
                     if (xhr.status === 200) {
                         if (statements.length === 0) {
                             statementsTableBody.add(noQueriesRow);
@@ -169,14 +182,27 @@
                                 iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
                                 // stack trace
                                 if (statement.stackTrace && statement.stackTrace.length > 0) {
+                                    statement.stackTrace = statement.stackTrace.replace(/\r\n|\n/g, '\r\n');
+                                    var linesCount = statement.stackTrace.split('\r\n').length;
                                     statementsTableBody.add(EE('tr',[
                                         EE('td',{'@colspan': 2 }, [
                                             EE('div',[
                                                 EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + statementId}, 'Stack trace')
-                                                    .on('click', showStackClickHandler(statementId)),
-                                                stackEl = EE('code',{'@class':'java','$display' : 'none', '@id' : 'stack-trace-' + statementId},statement.stackTrace)])
+                                                    .on('click', showStackClickHandler(statementId, linesCount)),
+                                                stackEl = EE('code',
+                                                    {'@class':'java',
+                                                        '$display' : 'none',
+                                                        '$overflow' : 'hidden',
+                                                        '@id' : 'stack-trace-' + statementId},
+                                                    statement.stackTrace),
+                                                EE('div', {'@class': 'show-all-stack', '$display' : 'none', '@id' :'show-all-stack-' + statementId},[
+                                                    EE('button', {
+                                                        '@class': 'btn btn-link btn-xs', '@id' :'show-all-stack-link-' + statementId
+                                                    }, 'Show all').on('click', showAllStackHandler(statementId))
+                                                ])
                                             ])
-                                        ]));
+                                        ])
+                                    ]));
                                     iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
                                 }
                             }
@@ -234,8 +260,8 @@
                         var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
                         var ajaxUrlLabel =
                             (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
-                            (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
-                            ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
+                                (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
+                                    ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
 
                         loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
                     }
