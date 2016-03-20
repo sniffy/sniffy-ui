@@ -114,6 +114,8 @@
             // increment global counter
             window.sniffy.numberOfSqlQueries += numQueries;
             $('.sniffy-query-count').fill(window.sniffy.numberOfSqlQueries);
+            $('.sniffy-query-count').set('+sniffy-query-count-bold');
+            setTimeout(function() {$('.sniffy-query-count').set('-sniffy-query-count-bold');}, 400);
         };
 
         var showStackClickHandler = function(num, linesCount) {
