@@ -31,12 +31,20 @@ module.exports = function (grunt) {
                   processIncludeContents: function(includeContents, localVars, filePath) {
                     return filePath.endsWith('.js') ? includeContents : 
                       includeContents.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, " ");
+                  },
+                  globals: {
+                    version: '<%= pkg.version %>'
                   }
                 },
                 src: 'src/sniffy.js',
                 dest: 'dist/sniffy.js'
             },
             iframe: {
+                options: {
+                  globals: {
+                    version: '<%= pkg.version %>'
+                  }
+                },
                 src: 'src/sniffy.iframe.html',
                 dest: 'build/sniffy.iframe.html'
             }
