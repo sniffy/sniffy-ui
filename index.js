@@ -2,8 +2,8 @@ var express = require('express');
 var cors = require('cors');
 var app = express();
 
-//app.use(cors({exposedHeaders: ['X-Sql-Queries', 'X-Request-Details']}));
-app.use(cors());
+app.use(cors({exposedHeaders: ['X-Sql-Queries', 'X-Request-Details']}));
+//app.use(cors());
 
 var counter = 1000;
 
