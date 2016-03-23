@@ -44,8 +44,9 @@
 
         var fixZIndex = function() {
             $('body *').filter(function(el, index){
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('$') !== 'sniffy-query-count' && $(el).get('$') !== 'sniffy-iframe';
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-query-count' && $(el).get('@id') !== 'sniffy-iframe';
             }).set('$zIndex','2147483646');
+            // TODO: fix it 
         };
         fixZIndex();
         window.setTimeout(fixZIndex, 10);
@@ -68,13 +69,13 @@
 
         // create main GUI
 
-        var iframe = EE('iframe', {'$display' : 'none', 'className' : 'sniffy-iframe', '@scrolling' : 'no'});
+        var iframe = EE('iframe', {'$display' : 'none', '@id' : 'sniffy-iframe', 'className' : 'sniffy-iframe', '@scrolling' : 'no'});
         $('body').add(iframe);
         var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         var toggleMaximizedIframe = iframe.toggle('maximized');
 
         // append toolbar
-        var queryCounterDiv = EE('div', { 'className' : 'sniffy-query-count' }, sqlQueries);
+        var queryCounterDiv = EE('div', { '@id' : 'sniffy-query-count', 'className' : 'sniffy-query-count' }, sqlQueries);
         var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'});
         queryCounterDiv.on('click', function() {
             toggleIframe();
