@@ -12,6 +12,7 @@
     "test": "grunt travis"
   },
   "dependencies": {
+    "cors": "^2.7.1",
     "express": "^4.13.3"
   },
   "devDependencies": {
