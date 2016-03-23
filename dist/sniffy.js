@@ -246,26 +246,32 @@
 
             function onReadyStateChange() {
                 if(self.readyState === 4 /* complete */) {
-                    var sqlQueries = self.getResponseHeader("X-Sql-Queries");
-                    if (sqlQueries && parseInt(sqlQueries) > 0) {
-                        incrementQueryCounter(parseInt(sqlQueries));
+                    try {
+                        var sqlQueries = self.getResponseHeader("X-Sql-Queries");
+                        if (sqlQueries && parseInt(sqlQueries) > 0) {
+                            incrementQueryCounter(parseInt(sqlQueries));
 
-                        var xRequestDetailsHeader = self.getResponseHeader("X-Request-Details"); // details url relative to ajax original request
+                            var xRequestDetailsHeader = self.getResponseHeader("X-Request-Details"); // details url relative to ajax original request
 
-                        var ajaxUrl = document.createElement('a');
-                        ajaxUrl.href = url;
-                        if ('' === ajaxUrl.protocol && '' === ajaxUrl.host) {
-                            ajaxUrl.protocol = location.protocol;
-                            ajaxUrl.host = location.host;
+                            var ajaxUrl = document.createElement('a');
+                            ajaxUrl.href = url;
+                            if ('' === ajaxUrl.protocol && '' === ajaxUrl.host) {
+                                ajaxUrl.protocol = location.protocol;
+                                ajaxUrl.host = location.host;
+                            }
+
+                            var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
+                            var ajaxUrlLabel =
+                                (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
+                                    (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
+                                        ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
+
+                            loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
                         }
-
-                        var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
-                        var ajaxUrlLabel =
-                            (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
-                                (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
-                                    ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
-
-                        loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
+                    } catch (e) {
+                        if (console && console.log) {
+                            console.log(e);
+                        }
                     }
                 }
 
