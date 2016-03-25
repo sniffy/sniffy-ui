@@ -139,6 +139,7 @@
                     stackTraceEl.hide();
                     showAllStackEl.hide();
                 }
+                iframe.get('contentWindow').nanoScroller();
             };
         };
 
@@ -148,6 +149,7 @@
                 var showAllStackEl = $(iframeDocument.getElementById('show-all-stack-' + num));
                 stackTraceEl.set('$height', 'auto');
                 showAllStackEl.hide();
+                iframe.get('contentWindow').nanoScroller();
             };
         };
 
@@ -213,6 +215,7 @@
                     } else {
                         statementsTableBody.add(noQueriesRow);
                     }
+                    iframe.get('contentWindow').nanoScroller();
                 })
                 .error(function (status, statusText, responseText) {
                     console.log(status + ' ' + statusText + ' ' + responseText);
