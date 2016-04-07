@@ -16,6 +16,17 @@
 
 			}
 
+			function doNoQueriesAjax() {
+
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", '204.json', true);
+				xhr.onreadystatechange = function() {
+					document.getElementById('result').innerHTML = 'completed!';
+				};
+				xhr.send(null);
+
+			}
+
 
 			function doCrossDomainAjax() {
 
@@ -55,6 +66,7 @@
 		doAjax();
 		</script>
 		<button id="button" onclick="doAjax()">Click me!</button>
+		<button id="button" onclick="doNoQueriesAjax()">No Queries AJAX!</button>
 		<button id="button" onclick="doCrossDomainAjax()">CORS!</button>
 		
 		<data id="sniffy" data-sql-queries="2" ></script>
