@@ -165,14 +165,14 @@
                         EE('td','No queries'),
                         EE('td','')
                     ]);
-                    iframe.get('contentWindow').hljs.configure({useBR: true});
-                    var stats = $.parseJSON(data);
-                    var statements = stats.executedQueries;
-                    statementsTableBody.add(EE('tr',[
-                        EE('th', {}, url),
-                        EE('th', {}, stats.time)
-                    ]));
-                    if (xhr.status === 200) {
+                    if (xhr.status === 200 && data !== '') {
+                        iframe.get('contentWindow').hljs.configure({useBR: true});
+                        var stats = $.parseJSON(data);
+                        var statements = stats.executedQueries;
+                        statementsTableBody.add(EE('tr',[
+                            EE('th', {}, url),
+                            EE('th', {}, stats.time)
+                        ]));
                         if (statements.length === 0) {
                             statementsTableBody.add(noQueriesRow);
                         } else {
