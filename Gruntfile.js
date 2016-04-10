@@ -135,8 +135,8 @@ module.exports = function (grunt) {
                 tasks: ['jshint:dist','includereplace:dist','uglify:dist','copy:mock']
             },
             styles: {
-                files: ['src/*.less'],
-                tasks: ['less:dist','copy:mock'],
+                files: ['src/less/*.less'],
+                tasks: ['less:dist','imageEmbed:dist','includereplace:dist','uglify:dist','copy:mock'],
                 options: {
                     nospawn: true
                 }

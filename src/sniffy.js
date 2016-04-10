@@ -44,7 +44,7 @@
 
         var fixZIndex = function() {
             $('body *').filter(function(el, index){
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-query-count' && $(el).get('@id') !== 'sniffy-iframe';
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-widget' && $(el).get('@id') !== 'sniffy-iframe';
             }).set('$zIndex','2147483646');
             // TODO: fix it 
         };
@@ -63,6 +63,7 @@
 
         var snifferElement = $('#sniffy');
         var sqlQueries = snifferElement.get('%sql-queries');
+        var serverTime = snifferElement.get('%server-time');
 
         // inject stylesheet
         $('head').add(EE('style', '//@@include("../build/sniffy.css")'));
@@ -74,18 +75,22 @@
         var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         var toggleMaximizedIframe = iframe.toggle('maximized');
 
-        // append toolbar
-        var queryCounterDiv = EE('div', { '@id' : 'sniffy-query-count', 'className' : 'sniffy-query-count' }, sqlQueries);
-        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'});
-        queryCounterDiv.on('click', function() {
+        // append sniffy widget
+        var queryWidget = EE('div', {'@id' : 'sniffy-widget'}, [
+            EE('div', {'$backgroundColor' : '#7A8288', '$color' : '#FFF'}, 'Sniffy'),
+            EE('div', {'className' : 'sniffy-server-time'}, serverTime),
+            EE('div', {'className' : 'sniffy-query-count'}, sqlQueries)
+        ]);
+
+        var toggleIcon = queryWidget.toggle({'$display': 'block'}, {'$display': 'none'});
+        queryWidget.on('click', function() {
             toggleIframe();
             toggleMaximizedIframe(false);
             toggleMaximizeIcon(false);
         });
-        $('body').add(queryCounterDiv);
+        $('body').add(queryWidget);
 
-        // create iframe GUI
-
+        // create iframe sniffy UI
         var iframeHtml = '//@@include("../build/sniffy.iframe.html")';
         var iframeDocument = iframe.get('contentWindow').document;
         iframeDocument.open();

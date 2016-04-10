@@ -29,30 +29,47 @@
 	}
 }
 
-.sniffy-query-count {
-	color:red;
-	text-align:center;
-	font-weight:bold;
+#sniffy-widget {
 	position:fixed;
-	right:20px;
-	bottom:20px;
-	width:24px;
-	height:24px;
-	background-size:100%;
+	right:0px;
+	bottom:0px;
+	width:48px;
+	padding:0px;
 	z-index:9999999990;
-	opacity:1.0;
-	font-size: 16px !important;
+	color: #C8C8C8;
+    background-color: #272B30;
+    border: 1px solid black;
+    font-size: 12px !important;
     line-height: normal !important;
-	background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAADAklEQVRIibWWzWscdRzGP59hCEGWEEIstZYQQntICbnqxYuI4E0EPcQ/QQ9eJd7s4lEEUfCil+5JL8WLJ98u6qmEkMUXqgQsNYRYllJKCPN4mNmd2aTZouBv2d1nZn6/5/v6fHcFGOxdB10GNoCNwFXCKuSiupRkAZxTCpICrCLHkJFwGDgQ94FfgT1gl3Bn69o2Dvb6a8i7wAvAcqCQdgXw3+FKOAK+S/J2ibwBbI0JTx/yFB5fzMAFYRl5Rb1dAkXX3RBE7IQxHVFqsm6I52BhvpyKT3CK7uxy4vLZ3DwKFy3fKc/OWWk2pXnNxAkFUJFuMrvRnv1sTraXM7BIAXyPHpzNXxvnNBYUdTbGO8DXAtwYXr8sPg88B2wCVwJLj0rvjHUI/ELYQb4Fvtla377rYNhfS3L4+rV3Rt3dg2G/l3DRWhs9pSR1zRIq5RgYEY6Qg6317fvd8zeG/UVh2cGw/wHwMuGHmB/F3YQ/lFGSh8ix8QSppitkAZTAXMK8spiwhmwIz0CeBT8vSUBXkBXxNQBrspFwL/AAeUA4QaqQohZfSuITSk+zkLCgtppCEooSrcZOpS1oEVgUF22aoyOVutQJ2FQntMKcbK7FWkITuh3LnVym86yma1xoGGdi6jExKU7bKZnyeMr7tN+PxTAqgfeAv0heRTeSLE+8bFg7UbdpoXtzgquQA3UX+CLJZyVwAnwEfpKwhF4CrggrwFPAEtID5gllasGfBB4KI+Ao+CdhX/lNvdu0bqWWJeRN8GnkK+En4NbW+vYt/sMa7PVBFjEvgi8BvzsY9t8H3mpGdYXuQ24b9pFDwt/gCDkmnDRcZcic2kvyJHihbvOsES7VI0iAD8uJ+TqHhbAaXG1SQWwfT+7RGeu2Az6d35E05eoI43/oImsDx2OTCfWYjQ1uzHVw3UVjS4/DVAXwKeRL5F7trnVamvdEaGM8FqKeg6kCRyQ3gY8FGAz7BeEysAnZRK9St+kFYAno0aSzHl0h9QC8b012AOyjPwM7wM74b8s/Owp6BPc7ajsAAAAASUVORK5CYII=);
+	text-align: center;	
 
 	&:hover {
 		cursor: pointer;
 	}
 }
 
+.sniffy-server-time {
+	margin: 6px 0;
+	padding-top: 28px;
+	height: 12px;
+	background-repeat: no-repeat;
+    background-position-x: center; 
+	background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAABGlBMVEUAAADIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj9PD6iAAAAXXRSTlMAAQIEBQYICg0ODxAREhMXGBobICElJigpLzAxNTY4OTtCRE9UVVZXXV9iZ2lrbHd4fICDhoiUl5ieo6aoq62vsLK0t7m8wMHKzM/R09rc3uDi5Obo6evz9ff5+/19ZtcTAAABAUlEQVQoU12Rx1ICQRQAe1HEnMWMijnnhDkHRFEw2///Gx5ccJe+Tfd7U1M1UCWZSgbUEmRyn+r3WbYu5jNlK7xPRsZ3jHJeWQpOVHcHmxsaBzZ/1PuwbKr59nAqdakeA5BWDxMALM1AsKVOANzqU7hrAQiu9TUB3WovkUCTOgKLekcssKe7cK5zNSGjb1DSoZrQoSb40jTAdqFQCEOLWkdRRwFyqlcAdKkBOV0hTlYfYVqfa8KFbvxdOB7zPWofcKifjRFf/6J5gDb14b8kLwzfyZT6MRb6/rK6Hh7WVIvLI+nh+bzqfvXrp42yyj/tR1V900OM1tmD4lfpdKGzIn4BYQtN+n8NUD8AAAAASUVORK5CYII=);
+}
+
+.sniffy-query-count {
+	margin: 6px 0;
+	padding-top: 28px;
+	height: 12px;
+	background-repeat: no-repeat;
+    background-position-x: center; 
+	background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAABO1BMVEUAAADIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMhCGBp5AAAAaHRSTlMAAQIDBAUGCAkKCwwNDg8QERITFBYZGhscHR4gISIjJCYnKCorLDU2Nzg5PENFR0lLT1BSVFVWW1xdXmFka3BzdXd4fouMjo+YnZ6io6Wqq7K0tcDFx87P09XZ2tzg5ujp6/Hz9/n7/YR5XWkAAAEVSURBVBgZbcGJOgJhGAbQ959mWoyoIUqWKEu2FI1sJQrZiUQUafnu/wp8v3hU4xywwNEb/bmN2/FNL1Kf9j6kEllFwegfJliDrBJgSbKouiD5C9TjY1uF5AHUUCpXfK23auXrwzUDgA5GJ5MC3RyrZROsTdS+z8YiU2OjgdBC6rRCRJtgWbJoeiEtP1GvnBuSBnjX8w8tkmo36XkN0MDqOzokYVMVASamL00wIno53pg1Bh1215Bvcfe8QZQEOyOrCTCx90m9ikFIAko489iijver+AggwJ6XFDBtYNhwOxUwd3oLjKhZSIQ9miIgbI7x6EGJyAS7I6sImJqnPtUVdDhjFw36VcmGBbpohn9mLujTFfz4AukHh1M21mcVAAAAAElFTkSuQmCC);
+}
+
 .sniffy-query-count-bold {
-	font-size: 17px !important;
+	font-size: 14px !important;
 	opacity: 0.6;
+	color: red;
 	transition: opacity .25s ease-in-out;
    -moz-transition: opacity .25s ease-in-out;
    -webkit-transition: opacity .25s ease-in-out;
