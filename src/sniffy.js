@@ -78,8 +78,14 @@
         // append sniffy widget
         var queryWidget = EE('div', {'@id' : 'sniffy-widget'}, [
             EE('div', {'$backgroundColor' : '#7A8288', '$color' : '#FFF'}, 'Sniffy'),
-            EE('div', {'className' : 'sniffy-server-time'}, serverTime),
-            EE('div', {'className' : 'sniffy-query-count'}, sqlQueries)
+            EE('div', {'className' : 'sniffy-server-time-outer'}, [
+                EE('div', {'className' : 'sniffy-server-time-image'}, ''),
+                EE('div', {'className' : 'sniffy-server-time'}, serverTime)
+            ]),
+            EE('div', {'className' : 'sniffy-query-count-outer'}, [
+                EE('div', {'className' : 'sniffy-query-count-image'}, ''),
+                EE('div', {'className' : 'sniffy-query-count'}, sqlQueries)
+            ])
         ]);
 
         var toggleIcon = queryWidget.toggle({'$display': 'block'}, {'$display': 'none'});
@@ -120,8 +126,8 @@
             // increment global counter
             window.sniffy.numberOfSqlQueries += numQueries;
             $('.sniffy-query-count').fill(window.sniffy.numberOfSqlQueries);
-            $('.sniffy-query-count').set('+sniffy-query-count-bold');
-            setTimeout(function() {$('.sniffy-query-count').set('-sniffy-query-count-bold');}, 400);
+            $('.sniffy-query-count-outer').set('+sniffy-query-count-bold');
+            setTimeout(function() {$('.sniffy-query-count-outer').set('-sniffy-query-count-bold');}, 400);
         };
 
         var showStackClickHandler = function(num, linesCount) {
