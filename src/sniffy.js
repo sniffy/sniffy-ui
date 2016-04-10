@@ -25,7 +25,8 @@
 
     window.sniffy = {
         numberOfSqlQueries : 0,
-        statementsCounter : 0
+        statementsCounter : 0,
+        serverTime : 0
     };
 
     var ajaxRequests = [];
@@ -36,6 +37,11 @@
     var incrementQueryCounter = function(numQueries) {
         // increment global counter
         window.sniffy.numberOfSqlQueries += numQueries;
+    };
+
+    var incrementServerTime = function(serverTime) {
+        // increment global counter
+        window.sniffy.serverTime += serverTime;
     };
 
     // setup sniffer UI on dom ready
@@ -130,6 +136,19 @@
             setTimeout(function() {$('.sniffy-query-count-outer').set('-sniffy-widget-icon-active');}, 400);
         };
 
+        incrementServerTime = function(serverTime) {
+            // increment global counter
+            serverTime = window.sniffy.serverTime += serverTime;
+
+            var formattedTime = serverTime < 1000 ? serverTime + 'ms' :
+                serverTime > 60000 ? Math.floor(serverTime / 60000) + 'm ' + Math.floor((serverTime % 60000) / 1000) + 's' :
+                serverTime / 1000 + 's';
+
+            $('.sniffy-server-time').fill(formattedTime);
+            $('.sniffy-server-time-outer').set('+sniffy-widget-icon-active');
+            setTimeout(function() {$('.sniffy-server-time-outer').set('-sniffy-widget-icon-active');}, 400);
+        };
+
         var showStackClickHandler = function(num, linesCount) {
             return function () {
                 var showStackEl = $(iframeDocument.getElementById('show-stack-' + num)),
@@ -165,6 +184,7 @@
         };
 
         incrementQueryCounter(parseInt(sqlQueries));
+        incrementServerTime(parseInt(serverTime));
 
         // request data
         loadQueries(location.pathname, baseUrl + 'request/' + requestId);
@@ -278,6 +298,11 @@
                             var sqlQueries = self.getResponseHeader("X-Sql-Queries");
                             if (sqlQueries && parseInt(sqlQueries) > 0) {
                                 incrementQueryCounter(parseInt(sqlQueries));
+
+                                var timeToFirstByte = self.getResponseHeader("X-Time-To-First-Byte");
+                                if (timeToFirstByte) {
+                                    incrementServerTime(parseInt(timeToFirstByte));
+                                }
 
                                 var xRequestDetailsHeader = self.getResponseHeader("X-Request-Details"); // details url relative to ajax original request
 
