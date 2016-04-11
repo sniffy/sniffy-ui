@@ -120,7 +120,43 @@ module.exports = function (grunt) {
                 preEncodeCallback: function () { return true; }
               }
             }
-          },
+        },
+        maven: {
+            options: {
+              groupId: 'io.sniffy',
+              artifactId : 'sniffy-ui'
+            },
+            install : {
+              options : {
+                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
+                packaging : 'jar'
+              },
+              src : ['dist/*'],
+              expand : true
+            },
+            deploy : {
+              options : {
+                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
+                packaging : 'jar',
+                url : 'https://oss.sonatype.org/content/repositories/snapshots/',
+                repositoryId : 'sonatype-nexus-snapshots'
+              },
+              src : ['dist/*'],
+              expand : true
+            },
+            stage : {
+              options : {
+                goal : 'deploy',
+                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
+                packaging : 'jar',
+                url : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/',
+                repositoryId : 'sonatype-nexus-staging'
+              },
+              src : ['dist/*'],
+              expand : true
+            }
+            
+        },
         watch: {
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
@@ -164,6 +200,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks("grunt-image-embed");
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-maven-tasks');
     grunt.loadNpmTasks('grunt-notify');
 
     // Default task
