@@ -206,7 +206,6 @@ module.exports = function (grunt) {
     // Default task
     grunt.registerTask('default', ['less', 'imageEmbed', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
     grunt.registerTask('travis', ['default']);
-    grunt.registerTask('travis', ['clean:build']);
 
     grunt.task.run('notify_hooks');
 };
