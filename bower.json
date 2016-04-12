@@ -24,6 +24,7 @@
   "dependencies": {
     "minified": "~2015.1.1",
     "bootstrap": "~3.3.5",
+    "nanoscroller": "~0.8.7",
     "clipboard": "~1.5.5"
   }
 }
