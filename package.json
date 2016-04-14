@@ -27,6 +27,7 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-image-embed": "^0.3.3",
     "grunt-include-replace": "^3.0.0",
+    "grunt-maven-tasks": "^1.3.5",
     "grunt-notify": "^0.4.5"
   }
 }
