@@ -19,7 +19,7 @@ module.exports = function (grunt) {
             mock: {
                 expand: true,
                 cwd: 'dist/',
-                src: ['sniffy.js','sniffy.min.js'],
+                src: ['sniffy.js','sniffy.min.js','sniffy.map'],
                 dest: 'mock/'
             }
         },
@@ -51,7 +51,9 @@ module.exports = function (grunt) {
         },
         uglify: {
             options: {
-                banner: '<%= banner %>'
+                banner: '<%= banner %>',
+                sourceMap: true,
+                sourceMapName: 'dist/sniffy.map'
             },
             dist: {
                 src: 'dist/sniffy.js',
