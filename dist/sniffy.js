@@ -213,7 +213,6 @@
                             }
                         }
                     } else {
-                        
                         statementsTableBody.add(noQueriesRow);
                     }
                     iframe.get('contentWindow').nanoScroller();
