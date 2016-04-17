@@ -25,17 +25,23 @@
 
     window.sniffy = {
         numberOfSqlQueries : 0,
-        statementsCounter : 0
+        statementsCounter : 0,
+        serverTime : 0
     };
 
     var ajaxRequests = [];
-    var loadQueries = function(url, requestId) {
-        ajaxRequests.push({"url":url,"requestId":requestId});
+    var loadQueries = function(url, requestId, timeToFirstByte) {
+        ajaxRequests.push({"url":url,"requestId":requestId,"timeToFirstByte":timeToFirstByte});
     };
 
     var incrementQueryCounter = function(numQueries) {
         // increment global counter
         window.sniffy.numberOfSqlQueries += numQueries;
+    };
+
+    var incrementServerTime = function(serverTime) {
+        // increment global counter
+        window.sniffy.serverTime += serverTime;
     };
 
     // setup sniffer UI on dom ready
@@ -44,7 +50,7 @@
 
         var fixZIndex = function() {
             $('body *').filter(function(el, index){
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-query-count' && $(el).get('@id') !== 'sniffy-iframe';
+                return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-widget' && $(el).get('@id') !== 'sniffy-iframe';
             }).set('$zIndex','2147483646');
             // TODO: fix it 
         };
@@ -63,6 +69,7 @@
 
         var snifferElement = $('#sniffy');
         var sqlQueries = snifferElement.get('%sql-queries');
+        var serverTime = snifferElement.get('%server-time');
 
         // inject stylesheet
         $('head').add(EE('style', '//@@include("../build/sniffy.css")'));
@@ -74,18 +81,28 @@
         var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
         var toggleMaximizedIframe = iframe.toggle('maximized');
 
-        // append toolbar
-        var queryCounterDiv = EE('div', { '@id' : 'sniffy-query-count', 'className' : 'sniffy-query-count' }, sqlQueries);
-        var toggleIcon = queryCounterDiv.toggle({'$display': 'block'}, {'$display': 'none'});
-        queryCounterDiv.on('click', function() {
+        // append sniffy widget
+        var queryWidget = EE('div', {'@id' : 'sniffy-widget'}, [
+            EE('div', {'$backgroundColor' : '#7A8288', '$color' : '#FFF'}, 'Sniffy'),
+            EE('div', {'className' : 'sniffy-server-time-outer sniffy-widget-icon'}, [
+                EE('div', {'className' : 'sniffy-server-time-image sniffy-widget-icon-image'}, ''),
+                EE('div', {'className' : 'sniffy-server-time sniffy-widget-icon-label'}, serverTime)
+            ]),
+            EE('div', {'className' : 'sniffy-query-count-outer sniffy-widget-icon'}, [
+                EE('div', {'className' : 'sniffy-query-count-image sniffy-widget-icon-image'}, ''),
+                EE('div', {'className' : 'sniffy-query-count sniffy-widget-icon-label'}, sqlQueries)
+            ])
+        ]);
+
+        var toggleIcon = queryWidget.toggle({'$display': 'block'}, {'$display': 'none'});
+        queryWidget.on('click', function() {
             toggleIframe();
             toggleMaximizedIframe(false);
             toggleMaximizeIcon(false);
         });
-        $('body').add(queryCounterDiv);
+        $('body').add(queryWidget);
 
-        // create iframe GUI
-
+        // create iframe sniffy UI
         var iframeHtml = '//@@include("../build/sniffy.iframe.html")';
         var iframeDocument = iframe.get('contentWindow').document;
         iframeDocument.open();
@@ -115,8 +132,21 @@
             // increment global counter
             window.sniffy.numberOfSqlQueries += numQueries;
             $('.sniffy-query-count').fill(window.sniffy.numberOfSqlQueries);
-            $('.sniffy-query-count').set('+sniffy-query-count-bold');
-            setTimeout(function() {$('.sniffy-query-count').set('-sniffy-query-count-bold');}, 400);
+            $('.sniffy-query-count-outer').set('+sniffy-widget-icon-active');
+            setTimeout(function() {$('.sniffy-query-count-outer').set('-sniffy-widget-icon-active');}, 400);
+        };
+
+        incrementServerTime = function(serverTime) {
+            // increment global counter
+            serverTime = window.sniffy.serverTime += serverTime;
+
+            var formattedTime = serverTime < 1000 ? serverTime + 'ms' :
+                serverTime > 60000 ? Math.floor(serverTime / 60000) + 'm ' + Math.floor((serverTime % 60000) / 1000) + 's' :
+                serverTime / 1000 + 's';
+
+            $('.sniffy-server-time').fill(formattedTime);
+            $('.sniffy-server-time-outer').set('+sniffy-widget-icon-active');
+            setTimeout(function() {$('.sniffy-server-time-outer').set('-sniffy-widget-icon-active');}, 400);
         };
 
         var showStackClickHandler = function(num, linesCount) {
@@ -154,11 +184,12 @@
         };
 
         incrementQueryCounter(parseInt(sqlQueries));
+        incrementServerTime(parseInt(serverTime));
 
         // request data
-        loadQueries(location.pathname, baseUrl + 'request/' + requestId);
+        loadQueries(location.pathname, baseUrl + 'request/' + requestId, parseInt(serverTime));
 
-        loadQueries = function(url, requestDetailsUrl) {
+        loadQueries = function(url, requestDetailsUrl, timeToFirstByte) {
             $.request('get', requestDetailsUrl)
                 .then(function (data, xhr) {
                     var noQueriesRow = EE('tr',[
@@ -168,6 +199,7 @@
                     if (xhr.status === 200 && data !== '') {
                         iframe.get('contentWindow').hljs.configure({useBR: true});
                         var stats = $.parseJSON(data);
+                        incrementServerTime(stats.time - stats.timeToFirstByte);
                         var statements = stats.executedQueries;
                         statementsTableBody.add(EE('tr',[
                             EE('th', {}, url),
@@ -213,6 +245,10 @@
                             }
                         }
                     } else {
+                        statementsTableBody.add(EE('tr',[
+                            EE('th', {}, url),
+                            EE('th', {}, timeToFirstByte)
+                        ]));
                         statementsTableBody.add(noQueriesRow);
                     }
                     iframe.get('contentWindow').nanoScroller();
@@ -224,7 +260,7 @@
 
         for (var i = 0; i < ajaxRequests.length; i++) {
             var ajaxRequest = ajaxRequests[i];
-            loadQueries(ajaxRequest.url, ajaxRequest.requestId);
+            loadQueries(ajaxRequest.url, ajaxRequest.requestId, ajaxRequest.timeToFirstByte);
         }
 
     });
@@ -265,8 +301,12 @@
 
                         if (hasSniffyHeader) {
                             var sqlQueries = self.getResponseHeader("X-Sql-Queries");
-                            if (sqlQueries && parseInt(sqlQueries) > 0) {
+                            var timeToFirstByte = self.getResponseHeader("X-Time-To-First-Byte");
+                            if ((sqlQueries && parseInt(sqlQueries) > 0) ||
+                                (timeToFirstByte && parseInt(timeToFirstByte))) {
+
                                 incrementQueryCounter(parseInt(sqlQueries));
+                                incrementServerTime(parseInt(timeToFirstByte));
 
                                 var xRequestDetailsHeader = self.getResponseHeader("X-Request-Details"); // details url relative to ajax original request
 
@@ -283,7 +323,7 @@
                                         (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
                                             ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
 
-                                loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
+                                loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl, timeToFirstByte);
                             }
                         }
                     } catch (e) {
