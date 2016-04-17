@@ -30,8 +30,8 @@
     };
 
     var ajaxRequests = [];
-    var loadQueries = function(url, requestId) {
-        ajaxRequests.push({"url":url,"requestId":requestId});
+    var loadQueries = function(url, requestId, timeToFirstByte) {
+        ajaxRequests.push({"url":url,"requestId":requestId,"timeToFirstByte":timeToFirstByte});
     };
 
     var incrementQueryCounter = function(numQueries) {
@@ -187,9 +187,9 @@
         incrementServerTime(parseInt(serverTime));
 
         // request data
-        loadQueries(location.pathname, baseUrl + 'request/' + requestId);
+        loadQueries(location.pathname, baseUrl + 'request/' + requestId, parseInt(serverTime));
 
-        loadQueries = function(url, requestDetailsUrl) {
+        loadQueries = function(url, requestDetailsUrl, timeToFirstByte) {
             $.request('get', requestDetailsUrl)
                 .then(function (data, xhr) {
                     var noQueriesRow = EE('tr',[
@@ -199,6 +199,7 @@
                     if (xhr.status === 200 && data !== '') {
                         iframe.get('contentWindow').hljs.configure({useBR: true});
                         var stats = $.parseJSON(data);
+                        incrementServerTime(stats.time - stats.timeToFirstByte);
                         var statements = stats.executedQueries;
                         statementsTableBody.add(EE('tr',[
                             EE('th', {}, url),
@@ -244,6 +245,10 @@
                             }
                         }
                     } else {
+                        statementsTableBody.add(EE('tr',[
+                            EE('th', {}, url),
+                            EE('th', {}, timeToFirstByte)
+                        ]));
                         statementsTableBody.add(noQueriesRow);
                     }
                     iframe.get('contentWindow').nanoScroller();
@@ -255,7 +260,7 @@
 
         for (var i = 0; i < ajaxRequests.length; i++) {
             var ajaxRequest = ajaxRequests[i];
-            loadQueries(ajaxRequest.url, ajaxRequest.requestId);
+            loadQueries(ajaxRequest.url, ajaxRequest.requestId, ajaxRequest.timeToFirstByte);
         }
 
     });
@@ -296,13 +301,12 @@
 
                         if (hasSniffyHeader) {
                             var sqlQueries = self.getResponseHeader("X-Sql-Queries");
-                            if (sqlQueries && parseInt(sqlQueries) > 0) {
-                                incrementQueryCounter(parseInt(sqlQueries));
+                            var timeToFirstByte = self.getResponseHeader("X-Time-To-First-Byte");
+                            if ((sqlQueries && parseInt(sqlQueries) > 0) ||
+                                (timeToFirstByte && parseInt(timeToFirstByte))) {
 
-                                var timeToFirstByte = self.getResponseHeader("X-Time-To-First-Byte");
-                                if (timeToFirstByte) {
-                                    incrementServerTime(parseInt(timeToFirstByte));
-                                }
+                                incrementQueryCounter(parseInt(sqlQueries));
+                                incrementServerTime(parseInt(timeToFirstByte));
 
                                 var xRequestDetailsHeader = self.getResponseHeader("X-Request-Details"); // details url relative to ajax original request
 
@@ -319,7 +323,7 @@
                                         (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
                                             ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
 
-                                loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl);
+                                loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl, timeToFirstByte);
                             }
                         }
                     } catch (e) {
