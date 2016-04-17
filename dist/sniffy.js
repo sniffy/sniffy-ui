@@ -1,4 +1,5 @@
-;(function(){
+var io = io || {};
+io.sniffy = io.sniffy || (function(){
 
     /*jshint unused:false*/
 
@@ -352,5 +353,7 @@
             send.call(this, data);
         };
     })(XMLHttpRequest);
+
+    return {};
 
 }.apply({}));
