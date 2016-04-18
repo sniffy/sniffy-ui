@@ -31,8 +31,8 @@ io.sniffy = io.sniffy || (function(){
     };
 
     var ajaxRequests = [];
-    var loadQueries = function(url, requestId, timeToFirstByte) {
-        ajaxRequests.push({"url":url,"requestId":requestId,"timeToFirstByte":timeToFirstByte});
+    var loadQueries = function(url, requestId, timeToFirstByte, doNotUpdateTimeCounter) {
+        ajaxRequests.push({"url":url,"requestId":requestId,"timeToFirstByte":timeToFirstByte,"doNotUpdateTimeCounter":doNotUpdateTimeCounter});
     };
 
     var incrementQueryCounter = function(numQueries) {
@@ -188,9 +188,9 @@ io.sniffy = io.sniffy || (function(){
         incrementServerTime(parseInt(serverTime));
 
         // request data
-        loadQueries(location.pathname, baseUrl + 'request/' + requestId, parseInt(serverTime));
+        loadQueries(location.pathname, baseUrl + 'request/' + requestId, parseInt(serverTime), true);
 
-        loadQueries = function(url, requestDetailsUrl, timeToFirstByte) {
+        loadQueries = function(url, requestDetailsUrl, timeToFirstByte, doNotUpdateTimeCounter) {
             $.request('get', requestDetailsUrl)
                 .then(function (data, xhr) {
                     var noQueriesRow = EE('tr',[
@@ -200,7 +200,9 @@ io.sniffy = io.sniffy || (function(){
                     if (xhr.status === 200 && data !== '') {
                         iframe.get('contentWindow').hljs.configure({useBR: true});
                         var stats = $.parseJSON(data);
-                        incrementServerTime(stats.time - stats.timeToFirstByte);
+                        if (!doNotUpdateTimeCounter) {
+                            incrementServerTime(stats.time - stats.timeToFirstByte);
+                        }
                         var statements = stats.executedQueries;
                         statementsTableBody.add(EE('tr',[
                             EE('th', {}, url),
@@ -261,7 +263,7 @@ io.sniffy = io.sniffy || (function(){
 
         for (var i = 0; i < ajaxRequests.length; i++) {
             var ajaxRequest = ajaxRequests[i];
-            loadQueries(ajaxRequest.url, ajaxRequest.requestId, ajaxRequest.timeToFirstByte);
+            loadQueries(ajaxRequest.url, ajaxRequest.requestId, ajaxRequest.timeToFirstByte, ajaxRequest.doNotUpdateTimeCounter);
         }
 
     });
@@ -324,7 +326,7 @@ io.sniffy = io.sniffy || (function(){
                                         (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
                                             ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
 
-                                loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl, timeToFirstByte);
+                                loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl, timeToFirstByte, false);
                             }
                         }
                     } catch (e) {
