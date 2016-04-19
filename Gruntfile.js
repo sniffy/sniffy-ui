@@ -1,9 +1,12 @@
 module.exports = function (grunt) {
     'use strict';
+
+    var pkg = grunt.file.readJSON('package.json');
+
     // Project configuration
     grunt.initConfig({
         // Metadata
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: pkg,
         banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
             '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
             '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
@@ -138,6 +141,7 @@ module.exports = function (grunt) {
                 destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
                 packaging : 'jar',
                 url : 'https://oss.sonatype.org/content/repositories/snapshots/',
+                settingsXml : 'settings.xml',
                 repositoryId : 'sonatype-nexus-snapshots'
               },
               src : ['dist/*'],
@@ -204,7 +208,12 @@ module.exports = function (grunt) {
 
     // Default task
     grunt.registerTask('default', ['less', 'imageEmbed', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
-    grunt.registerTask('travis', ['default']);
+
+    if (pkg.version.indexOf('SNAPSHOT') !== -1) {
+        grunt.registerTask('travis', ['default', 'maven:deploy']);
+    } else {
+        grunt.registerTask('travis', ['default']);
+    }
 
     grunt.task.run('notify_hooks');
 };
