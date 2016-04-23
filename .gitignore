@@ -33,3 +33,5 @@ build
 .idea
 
 COMMIT_MSG
+
+sniffy-ui-*.jar
