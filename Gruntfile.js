@@ -1,9 +1,12 @@
 module.exports = function (grunt) {
     'use strict';
+
+    var pkg = grunt.file.readJSON('package.json');
+
     // Project configuration
     grunt.initConfig({
         // Metadata
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: pkg,
         banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
             '<%= grunt.template.today("yyyy-mm-dd") %>\n' +
             '<%= pkg.homepage ? "* " + pkg.homepage + "\\n" : "" %>' +
@@ -19,7 +22,7 @@ module.exports = function (grunt) {
             mock: {
                 expand: true,
                 cwd: 'dist/',
-                src: ['sniffy.js','sniffy.min.js'],
+                src: ['sniffy.js','sniffy.min.js','sniffy.map'],
                 dest: 'mock/'
             }
         },
@@ -31,19 +34,29 @@ module.exports = function (grunt) {
                   processIncludeContents: function(includeContents, localVars, filePath) {
                     return filePath.endsWith('.js') ? includeContents : 
                       includeContents.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, " ");
+                  },
+                  globals: {
+                    version: '<%= pkg.version %>'
                   }
                 },
                 src: 'src/sniffy.js',
                 dest: 'dist/sniffy.js'
             },
             iframe: {
+                options: {
+                  globals: {
+                    version: '<%= pkg.version %>'
+                  }
+                },
                 src: 'src/sniffy.iframe.html',
                 dest: 'build/sniffy.iframe.html'
             }
         },
         uglify: {
             options: {
-                banner: '<%= banner %>'
+                banner: '<%= banner %>',
+                sourceMap: true,
+                sourceMapName: 'dist/sniffy.map'
             },
             dist: {
                 src: 'dist/sniffy.js',
@@ -87,9 +100,6 @@ module.exports = function (grunt) {
                 }
             }
         },
-        qunit: {
-            files: ['test/**/*.html']
-        },
         htmlmin: {
             dist: {
                 options: {
@@ -112,7 +122,44 @@ module.exports = function (grunt) {
                 preEncodeCallback: function () { return true; }
               }
             }
-          },
+        },
+        maven: {
+            options: {
+              groupId: 'io.sniffy',
+              artifactId : 'sniffy-ui'
+            },
+            install : {
+              options : {
+                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
+                packaging : 'jar'
+              },
+              src : ['dist/*'],
+              expand : true
+            },
+            deploy : {
+              options : {
+                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
+                packaging : 'jar',
+                url : 'https://oss.sonatype.org/content/repositories/snapshots/',
+                settingsXml : 'settings.xml',
+                repositoryId : 'sonatype-nexus-snapshots'
+              },
+              src : ['dist/*'],
+              expand : true
+            },
+            stage : {
+              options : {
+                goal : 'deploy',
+                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
+                packaging : 'jar',
+                url : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/',
+                repositoryId : 'sonatype-nexus-staging'
+              },
+              src : ['dist/*'],
+              expand : true
+            }
+            
+        },
         watch: {
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
@@ -127,8 +174,8 @@ module.exports = function (grunt) {
                 tasks: ['jshint:dist','includereplace:dist','uglify:dist','copy:mock']
             },
             styles: {
-                files: ['src/*.less'],
-                tasks: ['less:dist','copy:mock'],
+                files: ['src/less/*.less'],
+                tasks: ['less:dist','imageEmbed:dist','includereplace:dist','uglify:dist','copy:mock'],
                 options: {
                     nospawn: true
                 }
@@ -156,12 +203,17 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks("grunt-image-embed");
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-maven-tasks');
     grunt.loadNpmTasks('grunt-notify');
 
     // Default task
     grunt.registerTask('default', ['less', 'imageEmbed', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
-    grunt.registerTask('travis', ['default']);
-    grunt.registerTask('travis', ['clean:build']);
+
+    if (pkg.version.indexOf('SNAPSHOT') !== -1) {
+        grunt.registerTask('travis', ['default', 'maven:deploy']);
+    } else {
+        grunt.registerTask('travis', ['default']);
+    }
 
     grunt.task.run('notify_hooks');
 };
