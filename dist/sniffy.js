@@ -86,8 +86,6 @@ io.sniffy = io.sniffy || (function(){
 
             iframeEl.onload = null;
 
-            console.log("IFrame loaded!!");
-
             var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
             var toggleMaximizedIframe = iframe.toggle('maximized');
 
@@ -266,7 +264,9 @@ io.sniffy = io.sniffy || (function(){
                         iframe.get('contentWindow').nanoScroller();
                     })
                     .error(function (status, statusText, responseText) {
-                        console.log(status + ' ' + statusText + ' ' + responseText);
+                        if (console && console.log) {
+                            console.log(status + ' ' + statusText + ' ' + responseText);
+                        }
                     });
             };
 
