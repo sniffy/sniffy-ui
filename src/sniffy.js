@@ -79,6 +79,7 @@ io.sniffy = io.sniffy || (function(){
 
         var iframe = EE('iframe', {'$display' : 'none', '@id' : 'sniffy-iframe', 'className' : 'sniffy-iframe', '@scrolling' : 'no'});
         
+        var networkConnectionCounter = 1000; // TODO: do something smarter!
 
         var iframeEl = iframe[0];
 
@@ -217,9 +218,7 @@ io.sniffy = io.sniffy || (function(){
                                 EE('th', {}, url),
                                 EE('th', {}, stats.time)
                             ]));
-                            if (statements.length === 0) {
-                                statementsTableBody.add(noQueriesRow);
-                            } else {
+                            if (statements && statements.length !== 0) {
                                 for (var i = 0; i < statements.length; i++) {
                                     var statement = statements[i];
                                     var codeEl, stackEl, statementId = ++window.sniffy.statementsCounter;
@@ -253,6 +252,45 @@ io.sniffy = io.sniffy || (function(){
                                             ])
                                         ]));
                                         iframe.get('contentWindow').hljs.highlightBlock(stackEl[0]);
+                                    }
+                                }
+                            }
+                            var networkConnections = stats.networkConnections;
+                            if (networkConnections && networkConnections.length !== 0) {
+                                for (var j = 0; j < networkConnections.length; j++) {
+                                    var networkConnection = networkConnections[j];
+                                    var networkConnectionId = ++networkConnectionCounter;
+                                    var networkConnectionCodeEl, networkConnectionStackEl;
+                                    // sql + elapsed time
+                                    statementsTableBody.add(EE('tr',[
+                                        EE('td',[EE('div',[networkConnectionCodeEl = EE('code',{'@class':'language-sql'},networkConnection.host)])]),
+                                        EE('td',networkConnection.time)
+                                    ]));
+                                    iframe.get('contentWindow').hljs.highlightBlock(networkConnectionCodeEl[0]);
+                                    // stack trace
+                                    if (networkConnection.stackTrace && networkConnection.stackTrace.length > 0) {
+                                        networkConnection.stackTrace = networkConnection.stackTrace.replace(/\r\n|\n/g, '\r\n');
+                                        var networkConnectionLinesCount = networkConnection.stackTrace.split('\r\n').length;
+                                        statementsTableBody.add(EE('tr',[
+                                            EE('td',{'@colspan': 2 }, [
+                                                EE('div',[
+                                                    EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + networkConnectionId}, 'Stack trace')
+                                                        .on('click', showStackClickHandler(networkConnectionId, networkConnectionLinesCount)),
+                                                    networkConnectionStackEl = EE('code',
+                                                        {'@class':'java',
+                                                            '$display' : 'none',
+                                                            '$overflow' : 'hidden',
+                                                            '@id' : 'stack-trace-' + networkConnectionId},
+                                                        networkConnection.stackTrace),
+                                                    EE('div', {'@class': 'show-all-stack', '$display' : 'none', '@id' :'show-all-stack-' + networkConnectionId},[
+                                                        EE('button', {
+                                                            '@class': 'btn btn-link btn-xs', '@id' :'show-all-stack-link-' + networkConnectionId
+                                                        }, 'Show all').on('click', showAllStackHandler(networkConnectionId))
+                                                    ])
+                                                ])
+                                            ])
+                                        ]));
+                                        iframe.get('contentWindow').hljs.highlightBlock(networkConnectionStackEl[0]);
                                     }
                                 }
                             }
