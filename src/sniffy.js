@@ -263,7 +263,22 @@ io.sniffy = io.sniffy || (function(){
                                     var networkConnectionCodeEl, networkConnectionStackEl;
                                     // sql + elapsed time
                                     statementsTableBody.add(EE('tr',[
-                                        EE('td',[EE('div',[networkConnectionCodeEl = EE('code',{'@class':'language-sql'},networkConnection.host)])]),
+                                        EE('td',[EE('div',
+                                            [
+                                                networkConnectionCodeEl = EE('code',{'@class':'language-sql'},
+                                                    [
+                                                    networkConnection.host,
+                                                    EE('span',{'@class':'label label-success mx1'}, [
+                                                        networkConnection.bytesDown + ' bytes down',
+                                                        EE('span',{'@class':'glyphicon glyphicon-arrow-down','@aria-hidden':'true'})
+                                                        ]),
+                                                    EE('span',{'@class':'label label-danger'}, [
+                                                        networkConnection.bytesUp + ' bytes up',
+                                                        EE('span',{'@class':'glyphicon glyphicon-arrow-up','@aria-hidden':'true'})
+                                                        ])
+                                                    ]
+                                                )
+                                            ])]),
                                         EE('td',networkConnection.time)
                                     ]));
                                     iframe.get('contentWindow').hljs.highlightBlock(networkConnectionCodeEl[0]);
