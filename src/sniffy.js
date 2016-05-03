@@ -27,7 +27,8 @@ io.sniffy = io.sniffy || (function(){
     window.sniffy = {
         numberOfSqlQueries : 0,
         statementsCounter : 0,
-        serverTime : 0
+        serverTime : 0,
+        networkBytes : 0
     };
 
     var ajaxRequests = [];
@@ -43,6 +44,11 @@ io.sniffy = io.sniffy || (function(){
     var incrementServerTime = function(serverTime) {
         // increment global counter
         window.sniffy.serverTime += serverTime;
+    };
+
+    var incrementNetworkBytes = function(networkBytes) {
+        // increment global counter
+        window.sniffy.networkBytes += networkBytes;
     };
 
     // setup sniffer UI on dom ready
@@ -93,6 +99,11 @@ io.sniffy = io.sniffy || (function(){
             // append sniffy widget
             var queryWidget = EE('div', {'@id' : 'sniffy-widget'}, [
                 EE('div', {'$backgroundColor' : '#7A8288', '$color' : '#FFF'}, 'Sniffy'),
+
+                EE('div', {'className' : 'sniffy-network-outer sniffy-widget-icon'}, [
+                    EE('div', {'className' : 'sniffy-network-image sniffy-widget-icon-image'}, ''),
+                    EE('div', {'className' : 'sniffy-network sniffy-widget-icon-label'}, '0')
+                ]),
                 EE('div', {'className' : 'sniffy-server-time-outer sniffy-widget-icon'}, [
                     EE('div', {'className' : 'sniffy-server-time-image sniffy-widget-icon-image'}, ''),
                     EE('div', {'className' : 'sniffy-server-time sniffy-widget-icon-label'}, serverTime)
@@ -156,6 +167,19 @@ io.sniffy = io.sniffy || (function(){
                 $('.sniffy-server-time').fill(formattedTime);
                 $('.sniffy-server-time-outer').set('+sniffy-widget-icon-active');
                 setTimeout(function() {$('.sniffy-server-time-outer').set('-sniffy-widget-icon-active');}, 400);
+            };
+
+            incrementNetworkBytes = function(networkBytes) {
+                // increment global counter
+                networkBytes = window.sniffy.networkBytes += networkBytes;
+
+                var formattedNetworkBytes = networkBytes < 1000 ? networkBytes + ' b' :
+                    networkBytes > 1000000 ? Math.floor(networkBytes / 1000000) + ' Mb' :
+                    Math.floor(networkBytes / 1000) + ' Kb';
+
+                $('.sniffy-network').fill(formattedNetworkBytes);
+                $('.sniffy-network-outer').set('+sniffy-widget-icon-active');
+                setTimeout(function() {$('.sniffy-network-outer').set('-sniffy-widget-icon-active');}, 400);
             };
 
             var showStackClickHandler = function(num, linesCount) {
@@ -256,6 +280,9 @@ io.sniffy = io.sniffy || (function(){
                             var networkConnections = stats.networkConnections;
                             if (networkConnections && networkConnections.length !== 0) {
                                 for (var j = 0; j < networkConnections.length; j++) {
+
+                                    incrementNetworkBytes(networkConnections[j].bytesDown+networkConnections[j].bytesUp);
+
                                     var networkConnection = networkConnections[j];
                                     var networkConnectionId = ++networkConnectionCounter;
                                     var networkConnectionCodeEl, networkConnectionStackEl;
