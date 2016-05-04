@@ -57,7 +57,11 @@ io.sniffy = io.sniffy || (function(){
 
         var fixZIndex = function() {
             $('body *').filter(function(el, index){
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-widget' && $(el).get('@id') !== 'sniffy-iframe';
+                try {
+                    return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-widget' && $(el).get('@id') !== 'sniffy-iframe';
+                } catch (e) {
+                    return false;
+                }
             }).set('$zIndex','2147483646');
             // TODO: fix it 
         };
@@ -93,7 +97,19 @@ io.sniffy = io.sniffy || (function(){
 
             iframeEl.onload = null;
 
-            var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
+            var iframeVisible = false;
+
+            var toggleIframe = function() { 
+                iframeVisible = !iframeVisible;
+                if (iframeVisible) {
+                    iframe.set({'$display': 'block'});
+                    iframe.get('contentWindow').nanoScroller();
+                } else {
+                    iframe.set({'$display': 'none'});
+                }
+            };
+
+
             var toggleMaximizedIframe = iframe.toggle('maximized');
 
             // append sniffy widget
@@ -223,7 +239,7 @@ io.sniffy = io.sniffy || (function(){
             loadQueries(location.pathname, baseUrl + 'request/' + requestId, parseInt(serverTime), true);
 
             loadQueries = function(url, requestDetailsUrl, timeToFirstByte, doNotUpdateTimeCounter) {
-                $.request('get', requestDetailsUrl)
+                $.request('get', requestDetailsUrl, null, {xhr : {dataType : 'json'}})
                     .then(function (data, xhr) {
                         var noQueriesRow = EE('tr',[
                             EE('td','No queries'),
@@ -341,7 +357,9 @@ io.sniffy = io.sniffy || (function(){
                             ]));
                             statementsTableBody.add(noQueriesRow);
                         }
-                        iframe.get('contentWindow').nanoScroller();
+                        if (iframeVisible) {
+                            iframe.get('contentWindow').nanoScroller();
+                        }
                     })
                     .error(function (status, statusText, responseText) {
                         if (console && console.log) {

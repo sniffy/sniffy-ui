@@ -25,7 +25,8 @@ app.get('/mock/204.json', function (req, res) {
 });
 
 app.get('/mock/sniffy/a54b32e7-b94b-450b-b145-0cf62270d32b', function (req, res) {
-  res.status(204);
+  res.status(200);
+  res.header('Content-Type','application/json');
   res.send('');
 });
 
