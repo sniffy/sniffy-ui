@@ -60,7 +60,7 @@ io.sniffy = io.sniffy || (function(){
                 try {
                     return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-widget' && $(el).get('@id') !== 'sniffy-iframe';
                 } catch (e) {
-                    return false;
+                    return false; // Firefox throws an execption if this code is called inside IFRAME
                 }
             }).set('$zIndex','2147483646');
             // TODO: fix it 
