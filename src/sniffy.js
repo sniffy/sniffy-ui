@@ -261,8 +261,20 @@ io.sniffy = io.sniffy || (function(){
                                     var statement = statements[i];
                                     var codeEl, stackEl, statementId = ++window.sniffy.statementsCounter;
                                     // sql + elapsed time
-                                    statementsTableBody.add(EE('tr',[
-                                        EE('td',[EE('div',[codeEl = EE('code',{'@class':'language-sql'},statement.query)])]),
+                                    statementsTableBody.add(EE('tr', [
+
+                                        EE('td',[
+                                            EE('span',[codeEl = EE('code',{'@class':'language-sql'},statement.query)]),
+                                            EE('span',{'@class':'label label-success mx1'}, [
+                                                statement.bytesDown + ' bytes down',
+                                                EE('span',{'@class':'glyphicon glyphicon-arrow-down','@aria-hidden':'true'})
+                                                ]),
+                                            EE('span',{'@class':'label label-danger'}, [
+                                                statement.bytesUp + ' bytes up',
+                                                EE('span',{'@class':'glyphicon glyphicon-arrow-up','@aria-hidden':'true'})
+                                                ])
+                                            ]
+                                        ),
                                         EE('td',statement.time)
                                     ]));
                                     iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
