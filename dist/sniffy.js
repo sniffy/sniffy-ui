@@ -143,7 +143,7 @@ io.sniffy = io.sniffy || (function(){
             queryWidgetHeader.on('click', widgetMinimized);
 
 
-            var toggleIcon = queryWidgetContainer.toggle({'$display': 'block'}, {'$display': 'none'});
+            var toggleIcon = queryWidget.toggle({'$display': 'block'}, {'$display': 'none'});
             queryWidgetContainer.on('click', function() {
                 toggleIframe();
                 toggleMaximizedIframe(false);
