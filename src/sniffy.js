@@ -259,12 +259,22 @@ io.sniffy = io.sniffy || (function(){
                             if (statements && statements.length !== 0) {
                                 for (var i = 0; i < statements.length; i++) {
                                     var statement = statements[i];
+
+                                    incrementNetworkBytes(statement.bytesDown+statement.bytesUp);
+
                                     var codeEl, stackEl, statementId = ++window.sniffy.statementsCounter;
                                     // sql + elapsed time
                                     statementsTableBody.add(EE('tr', [
 
                                         EE('td',[
                                             EE('span',[codeEl = EE('code',{'@class':'language-sql'},statement.query)]),
+                                            (statement.invocations && statement.invocations > 1) ? EE('span',{'@class':'label label-warning mx1'}, [
+                                                'x' + statement.invocations
+                                                ]) : null,
+                                            (statement.rows) ? EE('span',{'@class':'label label-info mx1'}, [
+                                                statement.rows + ' rows',
+                                                EE('span',{'@class':'glyphicon glyphicon-menu-hamburger','@aria-hidden':'true'})
+                                                ]) : null,
                                             EE('span',{'@class':'label label-success mx1'}, [
                                                 statement.bytesDown + ' bytes down',
                                                 EE('span',{'@class':'glyphicon glyphicon-arrow-down','@aria-hidden':'true'})
