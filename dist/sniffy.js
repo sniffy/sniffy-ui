@@ -175,6 +175,7 @@ io.sniffy = io.sniffy || (function(){
                     serverTime : 0,
                     networkBytes : 0
                 };
+                iframe.get('contentWindow').nanoScroller();
             });
             
 
