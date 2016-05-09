@@ -164,6 +164,20 @@ io.sniffy = io.sniffy || (function(){
                 toggleIcon(false);
             });
 
+            $(iframeDocument.getElementById('sniffy-iframe-erase')).on('click', function() {
+                statementsTableBody.fill();
+                incrementQueryCounter(-1 * window.sniffy.numberOfSqlQueries);
+                incrementServerTime(-1 * window.sniffy.serverTime);
+                incrementNetworkBytes(-1 * window.sniffy.networkBytes);
+                window.sniffy = {
+                    numberOfSqlQueries : 0,
+                    statementsCounter : 0,
+                    serverTime : 0,
+                    networkBytes : 0
+                };
+            });
+            
+
             // todo persist maximized state; use some storage to keep the state between browser launches
             var toggleMaximizeIcon = $('span', $(iframeDocument.getElementById('sniffy-iframe-maximize'))).toggle(
                 {'$':'+glyphicon-resize-full -glyphicon-resize-small'},
