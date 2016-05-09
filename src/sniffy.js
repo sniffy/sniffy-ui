@@ -27,7 +27,8 @@ io.sniffy = io.sniffy || (function(){
     window.sniffy = {
         numberOfSqlQueries : 0,
         statementsCounter : 0,
-        serverTime : 0
+        serverTime : 0,
+        networkBytes : 0
     };
 
     var ajaxRequests = [];
@@ -45,13 +46,22 @@ io.sniffy = io.sniffy || (function(){
         window.sniffy.serverTime += serverTime;
     };
 
+    var incrementNetworkBytes = function(networkBytes) {
+        // increment global counter
+        window.sniffy.networkBytes += networkBytes;
+    };
+
     // setup sniffer UI on dom ready
 
     $(function(){
 
         var fixZIndex = function() {
             $('body *').filter(function(el, index){
-                return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-widget' && $(el).get('@id') !== 'sniffy-iframe';
+                try {
+                    return $(el).get('$zIndex') === '2147483647' && $(el).get('@id') !== 'sniffy-widget' && $(el).get('@id') !== 'sniffy-iframe';
+                } catch (e) {
+                    return false; // Firefox throws an execption if this code is called inside IFRAME
+                }
             }).set('$zIndex','2147483646');
             // TODO: fix it 
         };
@@ -79,6 +89,7 @@ io.sniffy = io.sniffy || (function(){
 
         var iframe = EE('iframe', {'$display' : 'none', '@id' : 'sniffy-iframe', 'className' : 'sniffy-iframe', '@scrolling' : 'no'});
         
+        var networkConnectionCounter = 1000; // TODO: do something smarter!
 
         var iframeEl = iframe[0];
 
@@ -86,14 +97,35 @@ io.sniffy = io.sniffy || (function(){
 
             iframeEl.onload = null;
 
-            console.log("IFrame loaded!!");
+            var iframeVisible = false;
 
-            var toggleIframe = iframe.toggle({'$display': 'none'}, {'$display': 'block'});
+            var toggleIframe = function() { 
+                iframeVisible = !iframeVisible;
+                if (iframeVisible) {
+                    iframe.set({'$display': 'block'});
+                    iframe.get('contentWindow').nanoScroller();
+                } else {
+                    iframe.set({'$display': 'none'});
+                }
+            };
+
+
             var toggleMaximizedIframe = iframe.toggle('maximized');
 
             // append sniffy widget
-            var queryWidget = EE('div', {'@id' : 'sniffy-widget'}, [
-                EE('div', {'$backgroundColor' : '#7A8288', '$color' : '#FFF'}, 'Sniffy'),
+            var queryWidgetContainer, queryWidgetHeader;
+            var queryWidget = EE('div', {'@id' : 'sniffy-widget', 'className' : 'sniffy-widget-maximized'}, [
+                queryWidgetHeader = EE('div', {'$backgroundColor' : '#7A8288', '$color' : '#FFF', 'className' : 'sniffy-widget-header'}, [
+                    EE('span', {}, '>'),
+                    'Sniffy',
+                    EE('span', {}, '>')
+                    ]),
+                queryWidgetContainer = EE('div', {'className' : 'sniffy-widget-icon-container'}, [
+
+                EE('div', {'className' : 'sniffy-network-outer sniffy-widget-icon'}, [
+                    EE('div', {'className' : 'sniffy-network-image sniffy-widget-icon-image'}, ''),
+                    EE('div', {'className' : 'sniffy-network sniffy-widget-icon-label'}, '0')
+                ]),
                 EE('div', {'className' : 'sniffy-server-time-outer sniffy-widget-icon'}, [
                     EE('div', {'className' : 'sniffy-server-time-image sniffy-widget-icon-image'}, ''),
                     EE('div', {'className' : 'sniffy-server-time sniffy-widget-icon-label'}, serverTime)
@@ -102,10 +134,17 @@ io.sniffy = io.sniffy || (function(){
                     EE('div', {'className' : 'sniffy-query-count-image sniffy-widget-icon-image'}, ''),
                     EE('div', {'className' : 'sniffy-query-count sniffy-widget-icon-label'}, sqlQueries)
                 ])
+
+                ])
+                
             ]);
 
-            var toggleIcon = queryWidget.toggle({'$display': 'block'}, {'$display': 'none'});
-            queryWidget.on('click', function() {
+            var widgetMinimized = queryWidget.toggle('-sniffy-widget-minimized +sniffy-widget-maximized', '+sniffy-widget-minimized -sniffy-widget-maximized');
+            queryWidgetHeader.on('click', widgetMinimized);
+
+
+            var toggleIcon = queryWidgetContainer.toggle({'$display': 'block'}, {'$display': 'none'});
+            queryWidgetContainer.on('click', function() {
                 toggleIframe();
                 toggleMaximizedIframe(false);
                 toggleMaximizeIcon(false);
@@ -124,6 +163,20 @@ io.sniffy = io.sniffy || (function(){
                 toggleIframe();
                 toggleIcon(false);
             });
+
+            $(iframeDocument.getElementById('sniffy-iframe-erase')).on('click', function() {
+                statementsTableBody.fill();
+                incrementQueryCounter(-1 * window.sniffy.numberOfSqlQueries);
+                incrementServerTime(-1 * window.sniffy.serverTime);
+                incrementNetworkBytes(-1 * window.sniffy.networkBytes);
+                window.sniffy = {
+                    numberOfSqlQueries : 0,
+                    statementsCounter : 0,
+                    serverTime : 0,
+                    networkBytes : 0
+                };
+            });
+            
 
             // todo persist maximized state; use some storage to keep the state between browser launches
             var toggleMaximizeIcon = $('span', $(iframeDocument.getElementById('sniffy-iframe-maximize'))).toggle(
@@ -157,6 +210,19 @@ io.sniffy = io.sniffy || (function(){
                 $('.sniffy-server-time').fill(formattedTime);
                 $('.sniffy-server-time-outer').set('+sniffy-widget-icon-active');
                 setTimeout(function() {$('.sniffy-server-time-outer').set('-sniffy-widget-icon-active');}, 400);
+            };
+
+            incrementNetworkBytes = function(networkBytes) {
+                // increment global counter
+                networkBytes = window.sniffy.networkBytes += networkBytes;
+
+                var formattedNetworkBytes = networkBytes < 1000 ? networkBytes + ' b' :
+                    networkBytes > 1000000 ? Math.floor(networkBytes / 1000000) + ' Mb' :
+                    Math.floor(networkBytes / 1000) + ' Kb';
+
+                $('.sniffy-network').fill(formattedNetworkBytes);
+                $('.sniffy-network-outer').set('+sniffy-widget-icon-active');
+                setTimeout(function() {$('.sniffy-network-outer').set('-sniffy-widget-icon-active');}, 400);
             };
 
             var showStackClickHandler = function(num, linesCount) {
@@ -200,7 +266,7 @@ io.sniffy = io.sniffy || (function(){
             loadQueries(location.pathname, baseUrl + 'request/' + requestId, parseInt(serverTime), true);
 
             loadQueries = function(url, requestDetailsUrl, timeToFirstByte, doNotUpdateTimeCounter) {
-                $.request('get', requestDetailsUrl)
+                $.request('get', requestDetailsUrl, null, {xhr : {dataType : 'json'}})
                     .then(function (data, xhr) {
                         var noQueriesRow = EE('tr',[
                             EE('td','No queries'),
@@ -217,15 +283,35 @@ io.sniffy = io.sniffy || (function(){
                                 EE('th', {}, url),
                                 EE('th', {}, stats.time)
                             ]));
-                            if (statements.length === 0) {
-                                statementsTableBody.add(noQueriesRow);
-                            } else {
+                            if (statements && statements.length !== 0) {
                                 for (var i = 0; i < statements.length; i++) {
                                     var statement = statements[i];
+
+                                    incrementNetworkBytes(statement.bytesDown+statement.bytesUp);
+
                                     var codeEl, stackEl, statementId = ++window.sniffy.statementsCounter;
                                     // sql + elapsed time
-                                    statementsTableBody.add(EE('tr',[
-                                        EE('td',[EE('div',[codeEl = EE('code',{'@class':'language-sql'},statement.query)])]),
+                                    statementsTableBody.add(EE('tr', [
+
+                                        EE('td',[
+                                            EE('span',[codeEl = EE('code',{'@class':'language-sql'},statement.query)]),
+                                            (statement.invocations && statement.invocations > 1) ? EE('span',{'@class':'label label-warning mx1'}, [
+                                                'x' + statement.invocations
+                                                ]) : null,
+                                            (statement.rows) ? EE('span',{'@class':'label label-info mx1'}, [
+                                                statement.rows + ' rows',
+                                                EE('span',{'@class':'glyphicon glyphicon-menu-hamburger','@aria-hidden':'true'})
+                                                ]) : null,
+                                            EE('span',{'@class':'label label-success mx1'}, [
+                                                statement.bytesDown + ' bytes down',
+                                                EE('span',{'@class':'glyphicon glyphicon-arrow-down','@aria-hidden':'true'})
+                                                ]),
+                                            EE('span',{'@class':'label label-danger mx1'}, [
+                                                statement.bytesUp + ' bytes up',
+                                                EE('span',{'@class':'glyphicon glyphicon-arrow-up','@aria-hidden':'true'})
+                                                ])
+                                            ]
+                                        ),
                                         EE('td',statement.time)
                                     ]));
                                     iframe.get('contentWindow').hljs.highlightBlock(codeEl[0]);
@@ -256,6 +342,63 @@ io.sniffy = io.sniffy || (function(){
                                     }
                                 }
                             }
+                            var networkConnections = stats.networkConnections;
+                            if (networkConnections && networkConnections.length !== 0) {
+                                for (var j = 0; j < networkConnections.length; j++) {
+
+                                    incrementNetworkBytes(networkConnections[j].bytesDown+networkConnections[j].bytesUp);
+
+                                    var networkConnection = networkConnections[j];
+                                    var networkConnectionId = ++networkConnectionCounter;
+                                    var networkConnectionCodeEl, networkConnectionStackEl;
+                                    // sql + elapsed time
+                                    statementsTableBody.add(EE('tr',[
+                                        EE('td',[EE('div',
+                                            [
+                                                networkConnectionCodeEl = EE('code',{'@class':'language-sql'},
+                                                    [
+                                                    networkConnection.host,
+                                                    EE('span',{'@class':'label label-success mx1'}, [
+                                                        networkConnection.bytesDown + ' bytes down',
+                                                        EE('span',{'@class':'glyphicon glyphicon-arrow-down','@aria-hidden':'true'})
+                                                        ]),
+                                                    EE('span',{'@class':'label label-danger'}, [
+                                                        networkConnection.bytesUp + ' bytes up',
+                                                        EE('span',{'@class':'glyphicon glyphicon-arrow-up','@aria-hidden':'true'})
+                                                        ])
+                                                    ]
+                                                )
+                                            ])]),
+                                        EE('td',networkConnection.time)
+                                    ]));
+                                    iframe.get('contentWindow').hljs.highlightBlock(networkConnectionCodeEl[0]);
+                                    // stack trace
+                                    if (networkConnection.stackTrace && networkConnection.stackTrace.length > 0) {
+                                        networkConnection.stackTrace = networkConnection.stackTrace.replace(/\r\n|\n/g, '\r\n');
+                                        var networkConnectionLinesCount = networkConnection.stackTrace.split('\r\n').length;
+                                        statementsTableBody.add(EE('tr',[
+                                            EE('td',{'@colspan': 2 }, [
+                                                EE('div',[
+                                                    EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + networkConnectionId}, 'Stack trace')
+                                                        .on('click', showStackClickHandler(networkConnectionId, networkConnectionLinesCount)),
+                                                    networkConnectionStackEl = EE('code',
+                                                        {'@class':'java',
+                                                            '$display' : 'none',
+                                                            '$overflow' : 'hidden',
+                                                            '@id' : 'stack-trace-' + networkConnectionId},
+                                                        networkConnection.stackTrace),
+                                                    EE('div', {'@class': 'show-all-stack', '$display' : 'none', '@id' :'show-all-stack-' + networkConnectionId},[
+                                                        EE('button', {
+                                                            '@class': 'btn btn-link btn-xs', '@id' :'show-all-stack-link-' + networkConnectionId
+                                                        }, 'Show all').on('click', showAllStackHandler(networkConnectionId))
+                                                    ])
+                                                ])
+                                            ])
+                                        ]));
+                                        iframe.get('contentWindow').hljs.highlightBlock(networkConnectionStackEl[0]);
+                                    }
+                                }
+                            }
                         } else {
                             statementsTableBody.add(EE('tr',[
                                 EE('th', {}, url),
@@ -263,10 +406,14 @@ io.sniffy = io.sniffy || (function(){
                             ]));
                             statementsTableBody.add(noQueriesRow);
                         }
-                        iframe.get('contentWindow').nanoScroller();
+                        if (iframeVisible) {
+                            iframe.get('contentWindow').nanoScroller();
+                        }
                     })
                     .error(function (status, statusText, responseText) {
-                        console.log(status + ' ' + statusText + ' ' + responseText);
+                        if (console && console.log) {
+                            console.log(status + ' ' + statusText + ' ' + responseText);
+                        }
                     });
             };
 
