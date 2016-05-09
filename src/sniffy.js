@@ -113,8 +113,14 @@ io.sniffy = io.sniffy || (function(){
             var toggleMaximizedIframe = iframe.toggle('maximized');
 
             // append sniffy widget
-            var queryWidget = EE('div', {'@id' : 'sniffy-widget'}, [
-                EE('div', {'$backgroundColor' : '#7A8288', '$color' : '#FFF'}, 'Sniffy'),
+            var queryWidgetContainer, queryWidgetHeader;
+            var queryWidget = EE('div', {'@id' : 'sniffy-widget', 'className' : 'sniffy-widget-maximized'}, [
+                queryWidgetHeader = EE('div', {'$backgroundColor' : '#7A8288', '$color' : '#FFF', 'className' : 'sniffy-widget-header'}, [
+                    EE('span', {}, '>'),
+                    'Sniffy',
+                    EE('span', {}, '>')
+                    ]),
+                queryWidgetContainer = EE('div', {'className' : 'sniffy-widget-icon-container'}, [
 
                 EE('div', {'className' : 'sniffy-network-outer sniffy-widget-icon'}, [
                     EE('div', {'className' : 'sniffy-network-image sniffy-widget-icon-image'}, ''),
@@ -128,10 +134,17 @@ io.sniffy = io.sniffy || (function(){
                     EE('div', {'className' : 'sniffy-query-count-image sniffy-widget-icon-image'}, ''),
                     EE('div', {'className' : 'sniffy-query-count sniffy-widget-icon-label'}, sqlQueries)
                 ])
+
+                ])
+                
             ]);
 
-            var toggleIcon = queryWidget.toggle({'$display': 'block'}, {'$display': 'none'});
-            queryWidget.on('click', function() {
+            var widgetMinimized = queryWidget.toggle('-sniffy-widget-minimized +sniffy-widget-maximized', '+sniffy-widget-minimized -sniffy-widget-maximized');
+            queryWidgetHeader.on('click', widgetMinimized);
+
+
+            var toggleIcon = queryWidgetContainer.toggle({'$display': 'block'}, {'$display': 'none'});
+            queryWidgetContainer.on('click', function() {
                 toggleIframe();
                 toggleMaximizedIframe(false);
                 toggleMaximizeIcon(false);
@@ -279,7 +292,7 @@ io.sniffy = io.sniffy || (function(){
                                                 statement.bytesDown + ' bytes down',
                                                 EE('span',{'@class':'glyphicon glyphicon-arrow-down','@aria-hidden':'true'})
                                                 ]),
-                                            EE('span',{'@class':'label label-danger'}, [
+                                            EE('span',{'@class':'label label-danger mx1'}, [
                                                 statement.bytesUp + ' bytes up',
                                                 EE('span',{'@class':'glyphicon glyphicon-arrow-up','@aria-hidden':'true'})
                                                 ])

@@ -44,6 +44,58 @@
 	&:hover {
 		cursor: pointer;
 	}
+
+	.sniffy-widget-header > span {
+		display: inline-block;
+		-webkit-transform: rotate(90deg);
+		-moz-transform: rotate(90deg);
+		-ms-transform: rotate(90deg);
+		-o-transform: rotate(90deg);
+		filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
+
+		-moz-transition: all .5s;
+    	-ms-transition: all .5s;
+    	-o-transition: all .5s;
+    	-webkit-transition: all .5s;
+    	transition: all .5s;
+	}
+
+	&.sniffy-widget-minimized .sniffy-widget-header > span {
+		-webkit-transform: rotate(-90deg);
+		-moz-transform: rotate(-90deg);
+		-ms-transform: rotate(-90deg);
+		-o-transform: rotate(-90deg);
+		filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+
+		-moz-transition: all .5s;
+    	-ms-transition: all .5s;
+    	-o-transition: all .5s;
+    	-webkit-transition: all .5s;
+    	transition: all .5s;
+	}
+
+
+
+	&.sniffy-widget-maximized .sniffy-widget-icon-container {
+		max-height: 168px;
+		
+		-moz-transition: max-height .5s;
+    	-ms-transition: max-height .5s;
+    	-o-transition: max-height .5s;
+    	-webkit-transition: max-height .5s;
+    	transition: max-height .5s;
+	}
+
+	&.sniffy-widget-minimized .sniffy-widget-icon-container {
+		max-height: 0;
+		overflow: hidden;
+
+		-moz-transition: max-height .5s;
+    	-ms-transition: max-height .5s;
+    	-o-transition: max-height .5s;
+    	-webkit-transition: max-height .5s;
+    	transition: max-height .5s;
+	}
 }
 
 .sniffy-widget-icon {
