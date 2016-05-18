@@ -27,7 +27,7 @@ app.get('/mock/204.json', function (req, res) {
 app.get('/mock/socketregistry/', function (req, res) {
   res.status(200);
   res.header('Content-Type','application/json');
-  res.send('[{"host":"en.wikipedia.org","port":"443","status":"OPEN"},{"host":"192.168.99.100","port":"3306","status":"OPEN"}]');
+  res.send('[{"host":"en.wikipedia.org","port":"443","status":"OPEN"},{"host":"192.168.99.100","port":"3306","status":"CLOSED"}]');
 });
 
 app.use('/mock', express.static('mock'));

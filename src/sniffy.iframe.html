@@ -41,7 +41,17 @@
 							</table>
 					    </div>
 					    <div role="tabpanel" class="tab-pane" id="networkconnections">
-					    	Network Connections;
+					    	<table class="table table-hover">
+								<thead>
+									<tr>
+										<th class="col-md-6">Host</th>
+										<th class="col-md-4">Port</th>
+										<th class="col-md-2">Status</th>
+									</tr>
+								</thead>
+								<tbody id="sniffy-socket-registry">
+								</tbody>
+							</table>
 					    </div>
 				    </div>	
 				</div>	
@@ -56,11 +66,49 @@
 		@@include('../bower_components/clipboard/dist/clipboard.min.js')
 		@@include('../bower_components/jquery/dist/jquery.min.js')
 		@@include('../bower_components/bootstrap/dist/js/bootstrap.min.js')
+		@@include('../bower_components/bootstrap-switch/dist/js/bootstrap-switch.min.js')
 		@@include('../vendor/nanoscroller.js')
 		new Clipboard('.clipboard');
 		function nanoScroller() {
 			$("#sniffy-queries-div").nanoScroller();
 	    }	    
+	    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		  nanoScroller();
+		});	    
+	    $('a[href="#networkconnections"]').on('shown.bs.tab', function (e) {
+	    	$.ajax({
+	    		url : window.parent.sniffy.baseUrl + 'socketregistry/',
+	    		dataType: "json"
+	    	}).done(function(data) {
+	    		$('#sniffy-socket-registry').empty();
+	    		$.each(data, function(i, item) {
+	    			var toggleButton;
+			        $('<tr>').append(
+			            $('<td>').text(item.host),
+			            $('<td>').text(item.port),
+			            $('<td>').append(
+			            	toggleButton = $('<input type="checkbox" checked data-toggle="toggle">', {
+			            		'checked' : item.status === 'OPEN'
+			            	})
+		            	)
+			        ).appendTo('#sniffy-socket-registry');
+			        toggleButton.bootstrapSwitch({
+				    	'size' : 'mini',
+				    	'onSwitchChange' : function(event, state) {
+				    		$.ajax({
+							    url: window.parent.sniffy.baseUrl + 'socketregistry/' + item.host + ':' + item.port,
+							    type: state ? 'POST' : 'DELETE',
+							    success: function(result) {
+							        console.log(result);
+							    }
+							});
+				    	}
+				    });
+			    });
+			    
+	    	});	
+	    	
+		});
 	</script>	
 </body>
 </html>
