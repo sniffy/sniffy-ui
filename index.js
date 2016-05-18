@@ -24,10 +24,10 @@ app.get('/mock/204.json', function (req, res) {
   res.send('{"foo":"bar","baz":42}');
 });
 
-app.get('/mock/sniffy/a54b32e7-b94b-450b-b145-0cf62270d32b', function (req, res) {
+app.get('/mock/socketregistry/', function (req, res) {
   res.status(200);
   res.header('Content-Type','application/json');
-  res.send('');
+  res.send('[{"host":"en.wikipedia.org","port":"443","status":"OPEN"},{"host":"192.168.99.100","port":"3306","status":"OPEN"}]');
 });
 
 app.use('/mock', express.static('mock'));
