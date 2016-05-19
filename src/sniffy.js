@@ -78,6 +78,8 @@ io.sniffy = io.sniffy || (function(){
         var snifferScriptSrc = snifferHeaderElement.get('@src');
         var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
+        window.sniffy.baseUrl = baseUrl;
+
         var snifferElement = $('#sniffy');
         var sqlQueries = snifferElement.get('%sql-queries');
         var serverTime = snifferElement.get('%server-time');

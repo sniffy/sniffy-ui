@@ -18,21 +18,42 @@
 				<a href="javascript:void(0);" id="sniffy-iframe-maximize"><span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span></a>
 				<a href="javascript:void(0);" id="sniffy-iframe-close"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
 			</div>	
-			<h3 class="panel-title">Executed Queries</h3>
+			<!-- <h3 class="panel-title">Executed Queries</h3> -->
+			<ul class="nav nav-tabs" role="tablist">
+			    <li role="presentation" class="active"><a href="#executedqueries" aria-controls="executedqueries" role="tab" data-toggle="tab">Executed Queries</a></li>
+			    <li role="presentation"><a href="#networkconnections" aria-controls="networkconnections" role="tab" data-toggle="tab">Network Connections</a></li>
+			  </ul>
 		</div>
-		<div style="position:absolute; top:38px; bottom:38px; left:0px; right: 0px">
+		<div style="position:absolute; top:38px; bottom:38px; left:0px; right: 0px" class="tab-content">
 			<div class="nano" id="sniffy-queries-div">
 				<div class="nano-content">
-					<table class="table table-hover">
-						<thead>
-							<tr>
-								<th class="col-md-10">Query</th>
-								<th class="col-md-2" title="Elapsed Time (millis)">Time (ms)</th>
-							</tr>
-						</thead>
-						<tbody id="sniffy-queries">
-						</tbody>
-					</table>
+					<div class="tab-content">
+					    <div role="tabpanel" class="tab-pane active" id="executedqueries">
+					    	<table class="table table-hover">
+								<thead>
+									<tr>
+										<th class="col-md-10">Query</th>
+										<th class="col-md-2" title="Elapsed Time (millis)">Time (ms)</th>
+									</tr>
+								</thead>
+								<tbody id="sniffy-queries">
+								</tbody>
+							</table>
+					    </div>
+					    <div role="tabpanel" class="tab-pane" id="networkconnections">
+					    	<table class="table table-hover">
+								<thead>
+									<tr>
+										<th class="col-md-6">Host</th>
+										<th class="col-md-4">Port</th>
+										<th class="col-md-2">Status</th>
+									</tr>
+								</thead>
+								<tbody id="sniffy-socket-registry">
+								</tbody>
+							</table>
+					    </div>
+				    </div>	
 				</div>	
 			</div>
 		</div>
@@ -44,11 +65,51 @@
 		@@include('../vendor/highlight.js')
 		@@include('../bower_components/clipboard/dist/clipboard.min.js')
 		@@include('../bower_components/jquery/dist/jquery.min.js')
+		@@include('../bower_components/bootstrap/dist/js/bootstrap.min.js')
+		@@include('../bower_components/bootstrap-switch/dist/js/bootstrap-switch.min.js')
 		@@include('../vendor/nanoscroller.js')
 		new Clipboard('.clipboard');
 		function nanoScroller() {
 			$("#sniffy-queries-div").nanoScroller();
 	    }	    
+	    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+		  nanoScroller();
+		});	    
+	    $('a[href="#networkconnections"]').on('shown.bs.tab', function (e) {
+	    	$.ajax({
+	    		url : window.parent.sniffy.baseUrl + 'socketregistry/',
+	    		dataType: "json"
+	    	}).done(function(data) {
+	    		$('#sniffy-socket-registry').empty();
+	    		$.each(data, function(i, item) {
+	    			var toggleButton;
+			        $('<tr>').append(
+			            $('<td>').text(item.host),
+			            $('<td>').text(item.port),
+			            $('<td>').append(
+			            	toggleButton = $('<input type="checkbox" data-toggle="toggle">')
+		            	)
+			        ).appendTo('#sniffy-socket-registry');
+			        if (item.status == 'OPEN') {
+			        	toggleButton.attr('checked', true);
+				    }
+			        toggleButton.bootstrapSwitch({
+				    	'size' : 'mini',
+				    	'onSwitchChange' : function(event, state) {
+				    		$.ajax({
+							    url: window.parent.sniffy.baseUrl + 'socketregistry/' + item.host + ':' + item.port,
+							    type: state ? 'POST' : 'DELETE',
+							    success: function(result) {
+							        console.log(result);
+							    }
+							});
+				    	}
+				    });
+			    });
+			    
+	    	});	
+	    	
+		});
 	</script>	
 </body>
 </html>
