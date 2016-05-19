@@ -87,11 +87,12 @@
 			            $('<td>').text(item.host),
 			            $('<td>').text(item.port),
 			            $('<td>').append(
-			            	toggleButton = $('<input type="checkbox" checked data-toggle="toggle">', {
-			            		'checked' : item.status === 'OPEN'
-			            	})
+			            	toggleButton = $('<input type="checkbox" data-toggle="toggle">')
 		            	)
 			        ).appendTo('#sniffy-socket-registry');
+			        if (item.status == 'OPEN') {
+			        	toggleButton.attr('checked', true);
+				    }
 			        toggleButton.bootstrapSwitch({
 				    	'size' : 'mini',
 				    	'onSwitchChange' : function(event, state) {
