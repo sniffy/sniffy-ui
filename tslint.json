@@ -1,0 +1,14 @@
+{
+  "rules": {
+    "no-unused-variable": true,
+    "no-use-before-declare": true,
+    "no-var-keyword": true,
+    "quotemark": [true, "single"],
+    "semicolon": true,
+    "triple-equals": true,
+    "use-strict": {
+      "check-module": true
+    },
+    "variable-name": true
+  }
+}
