@@ -5,7 +5,9 @@ logs
 # IDEA
 *.iml
 
+# Auto Atom TS compiler
 src/ts/*.js
+src/ts/*.js.map
 
 # Runtime data
 pids
