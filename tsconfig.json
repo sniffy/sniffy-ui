@@ -9,10 +9,19 @@
     "removeComments": false,
     "noImplicitAny": false
   },
-  "files": ["src/ts/*.ts"],
+  "compileOnSave": false,
+  "files": [
+    "src/ts/Sniffy.ts",
+    "src/ts/SniffySummary.ts",
+    "src/ts/SniffyWidget.ts",
+    "typings/index.d.ts",
+    "typings/lodash/lodash.d.ts",
+    "typings/tsd.d.ts"
+  ],
   "exclude": [
-    "node_modules",
-    "typings/main",
-    "typings/main.d.ts"
-  ]
+    "node_modules"
+  ],
+  "atom": {
+    "formatOnSave": true
+  }
 }
