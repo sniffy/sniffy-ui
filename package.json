@@ -9,7 +9,8 @@
     "url": "https://github.com/sniffy/sniffy-ui.git"
   },
   "scripts": {
-    "test": "grunt travis"
+    "build": "browserify browser.js -o static/bundle.js",
+    "watch": "watchify browser.js -o static/bundle.js --debug --verbose"
   },
   "dependencies": {
     "cors": "^2.7.1",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "bower": "^1.7.7",
+    "browserify": "^13.0.1",
     "del": "^2.2.0",
     "grunt": "^0.4.5",
     "grunt-contrib-clean": "^0.7.0",
@@ -42,6 +44,7 @@
     "gulp-sourcemaps": "^1.5.1",
     "gulp-tslint": "^5.0.0",
     "gulp-typescript": "^2.5.0",
-    "tslint": "^3.10.2"
+    "tslint": "^3.10.2",
+    "vinyl-source-stream": "^1.1.0"
   }
 }

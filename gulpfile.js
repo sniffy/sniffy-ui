@@ -4,28 +4,15 @@ var gulp = require('gulp'),
     debug = require('gulp-debug'),
     inject = require('gulp-inject'),
     tsc = require('gulp-typescript'),
+    source = require('vinyl-source-stream'),
     tslint = require('gulp-tslint'),
     sourcemaps = require('gulp-sourcemaps'),
     del = require('del'),
     Config = require('./gulpfile.config'),
-    tsProject = tsc.createProject('tsconfig.json');
+    tsProject = tsc.createProject('tsconfig.json'),
+    browserify = require('browserify');
 
 var config = new Config();
-
-/**
- * Generates the app.d.ts references file dynamically from all application *.ts files.
- */
-// gulp.task('gen-ts-refs', function () {
-//     var target = gulp.src(config.appTypeScriptReferences);
-//     var sources = gulp.src([config.allTypeScript], {read: false});
-//     return target.pipe(inject(sources, {
-//         starttag: '//{',
-//         endtag: '//}',
-//         transform: function (filepath) {
-//             return '/// <reference path="../..' + filepath + '" />';
-//         }
-//     })).pipe(gulp.dest(config.typings));
-// });
 
 /**
  * Lint all custom TypeScript files.
@@ -62,8 +49,6 @@ gulp.task('clean-ts', function (cb) {
                               config.tsOutputPath +'/**/*.js.map', // path to all sourcemap files auto gen'd by editor
                               '!' + config.tsOutputPath + '/lib'
                            ];
-
-  // delete the files
   del(typeScriptGenFiles, cb);
 });
 
@@ -71,22 +56,15 @@ gulp.task('watch', function() {
     gulp.watch([config.allTypeScript], ['ts-lint', 'compile-ts']);
 });
 
-// gulp.task('serve', ['compile-ts', 'watch'], function() {
-//   process.stdout.write('Starting browserSync and superstatic...\n');
-//   browserSync({
-//     port: 3000,
-//     files: ['index.html', '**/*.js'],
-//     injectChanges: true,
-//     logFileChanges: false,
-//     logLevel: 'silent',
-//     logPrefix: 'angularin20typescript',
-//     notify: true,
-//     reloadDelay: 0,
-//     server: {
-//       baseDir: './src',
-//       middleware: superstatic({ debug: false})
-//     }
-//   });
-// });
+gulp.task('compile', function() {
+    return browserify({
+        entries: ['./build/js/Sniffy.js'],
+        debug: true
+      }).bundle()
+        .pipe(source('sniffy.bundle.js'))
+        .pipe(sourcemaps.init({loadMaps: true})) // loads map from browserify file
+        .pipe(sourcemaps.write('./')) // writes .map file
+        .pipe(gulp.dest('./dist'));
+});
 
-gulp.task('default', ['ts-lint', 'compile-ts']);
+gulp.task('default', ['ts-lint', 'compile-ts', 'compile']);
