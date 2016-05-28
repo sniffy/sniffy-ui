@@ -2,9 +2,9 @@
 
 export class SniffyWidget {
 
-  public x: number;
+    public x: number;
 
-  y: Number = Math.floor(123);
+    y: Number = Math.floor(123);
 
 
 

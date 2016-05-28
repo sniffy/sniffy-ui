@@ -63,7 +63,7 @@ io.sniffy = io.sniffy || (function(){
                     return false; // Firefox throws an execption if this code is called inside IFRAME
                 }
             }).set('$zIndex','2147483646');
-            // TODO: fix it 
+            // TODO: fix it
         };
         fixZIndex();
         window.setTimeout(fixZIndex, 10);
@@ -88,7 +88,7 @@ io.sniffy = io.sniffy || (function(){
         // create main GUI
 
         var iframe = EE('iframe', {'$display' : 'none', '@id' : 'sniffy-iframe', 'className' : 'sniffy-iframe', '@scrolling' : 'no'});
-        
+
         var networkConnectionCounter = 1000; // TODO: do something smarter!
 
         var iframeEl = iframe[0];
@@ -99,7 +99,7 @@ io.sniffy = io.sniffy || (function(){
 
             var iframeVisible = false;
 
-            var toggleIframe = function() { 
+            var toggleIframe = function() {
                 iframeVisible = !iframeVisible;
                 if (iframeVisible) {
                     iframe.set({'$display': 'block'});
@@ -136,7 +136,7 @@ io.sniffy = io.sniffy || (function(){
                 ])
 
                 ])
-                
+
             ]);
 
             var widgetMinimized = queryWidget.toggle('-sniffy-widget-minimized +sniffy-widget-maximized', '+sniffy-widget-minimized -sniffy-widget-maximized');
@@ -177,7 +177,7 @@ io.sniffy = io.sniffy || (function(){
                 };
                 iframe.get('contentWindow').nanoScroller();
             });
-            
+
 
             // todo persist maximized state; use some storage to keep the state between browser launches
             var toggleMaximizeIcon = $('span', $(iframeDocument.getElementById('sniffy-iframe-maximize'))).toggle(

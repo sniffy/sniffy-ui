@@ -16,7 +16,8 @@
     "src/ts/SniffyWidget.ts",
     "typings/index.d.ts",
     "typings/lodash/lodash.d.ts",
-    "typings/tsd.d.ts"
+    "typings/tsd.d.ts",
+    "typings/minified/minified.d.ts"
   ],
   "exclude": [
     "node_modules"
