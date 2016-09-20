@@ -31,6 +31,29 @@ io.sniffy = io.sniffy || (function(){
         networkBytes : 0
     };
 
+    // util functions
+
+    function absolute(base, relative) {
+        var stack = base.split("/"),
+            parts = relative.split("/");
+        stack.pop(); // remove current file name (or empty string)
+                     // (omit if "base" is the current folder without trailing slash)
+        for (var i=0; i<parts.length; i++) {
+            if (parts[i] === ".") {
+                continue;
+            }
+            if (parts[i] === "..") {
+                stack.pop();
+            }
+            else {
+                stack.push(parts[i]);
+            }
+        }
+        return stack.join("/");
+    }
+
+    // implementation
+
     var ajaxRequests = [];
     var loadQueries = function(url, requestId, timeToFirstByte, doNotUpdateTimeCounter) {
         ajaxRequests.push({"url":url,"requestId":requestId,"timeToFirstByte":timeToFirstByte,"doNotUpdateTimeCounter":doNotUpdateTimeCounter});
@@ -483,7 +506,7 @@ io.sniffy = io.sniffy || (function(){
                                     ajaxUrl.host = location.host;
                                 }
 
-                                var requestDetailsUrl = ajaxUrl.protocol + '//' + ajaxUrl.host + xRequestDetailsHeader;
+                                var requestDetailsUrl = absolute(url, xRequestDetailsHeader);
                                 var ajaxUrlLabel =
                                     (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
                                         (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
