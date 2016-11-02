@@ -3,7 +3,7 @@
   "title": "UI for Sniffy",
   "author": "bedrin <Dmitry.Bedrin@gmail.com>",
   "license": "MIT",
-  "version": "3.1.0-RC6-SNAPSHOT",
+  "version": "3.1.0-RC8-SNAPSHOT",
   "repository": {
     "type": "git",
     "url": "https://github.com/sniffy/sniffy-ui.git"
