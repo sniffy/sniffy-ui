@@ -63,6 +63,24 @@
 								<tbody id="sniffy-socket-registry">
 								</tbody>
 							</table>
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th class="col-md-10">Settings</th>
+										<th class="col-md-2"></th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="col-md-10">
+											<label for="persistent">Keep the fault tolerance settings after server restart</label>
+										</td>
+										<td class="col-md-2">
+											<input type="checkbox" data-toggle="toggle" id="persistent"/>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 					    </div>
 				    </div>	
 				</div>	
@@ -92,6 +110,26 @@
 	    		dataType: "json"
 	    	}).done(function(data) {
 	    		$('#sniffy-datasource-registry').empty();
+
+				var persistentToggleButton = $('#persistent');
+
+				if (true === data.persistent) {
+					persistentToggleButton.attr('checked', true);
+				}
+
+				persistentToggleButton.bootstrapSwitch({
+			    	'size' : 'mini',
+			    	'onSwitchChange' : function(event, state) {
+			    		$.ajax({
+						    url: window.parent.sniffy.baseUrl + 'connectionregistry/persistent/',
+						    type: state ? 'POST' : 'DELETE',
+						    success: function(result) {
+						        console.log(result);
+						    }
+						});
+			    	}
+			    });
+
 	    		$.each(data.dataSources, function(i, item) {
 	    			var toggleButton;
 			        $('<tr>').append(
