@@ -506,7 +506,13 @@ io.sniffy = io.sniffy || (function(){
                                     ajaxUrl.host = location.host;
                                 }
 
-                                var requestDetailsUrl = absolute(url, xRequestDetailsHeader);
+                                url = ajaxUrl.href;
+
+                                var requestDetailsUrl = 
+                                  xRequestDetailsHeader.lastIndexOf('./',0) === 0 ? 
+                                  url + xRequestDetailsHeader.substring(1) :
+                                  absolute(url, xRequestDetailsHeader);
+
                                 var ajaxUrlLabel =
                                     (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
                                         (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
