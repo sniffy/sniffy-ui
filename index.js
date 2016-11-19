@@ -11,7 +11,7 @@ app.get('/mock/ajax.json', function (req, res) {
   res.header('X-Sql-Queries' , 2 );
   res.header('X-Time-To-First-Byte' , 21 );
   //res.header('X-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
-  res.header('X-Request-Details' , '/mock/request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('X-Request-Details' , 'request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
   res.send('{"foo":"bar","baz":42}');
 });
 
@@ -23,11 +23,19 @@ app.get('/mock/path/subpath/ajax.json', function (req, res) {
   res.send('{"foo":"bar","baz":42}');
 });
 
+app.get('/mock/notrailingslash', function (req, res) {
+  res.header('X-Sql-Queries' , 2 );
+  res.header('X-Time-To-First-Byte' , 21 );
+  //res.header('X-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('X-Request-Details' , './request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.send('{"foo":"bar","baz":42}');
+});
+
 app.get('/mock/204.json', function (req, res) {
   res.header('X-Sql-Queries' , 1 );
   res.header('X-Time-To-First-Byte' , 21 );
   //res.header('X-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
-  res.header('X-Request-Details' , '/mock/sniffy/a54b32e7-b94b-450b-b145-0cf62270d32b' );
+  res.header('X-Request-Details' , 'request/b43a32e7-b94b-450b-b145-0cf62270d32a' );
   res.send('{"foo":"bar","baz":42}');
 });
 

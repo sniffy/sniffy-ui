@@ -17,6 +17,17 @@
 
 			}
 
+			function doAjaxNoTrailingSlash() {
+
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", 'notrailingslash', true);
+				xhr.onreadystatechange = function() {
+					document.getElementById('result').innerHTML = 'completed!';
+				};
+				xhr.send(null);
+
+			}
+
 			function doNoQueriesAjax() {
 
 				var xhr = new XMLHttpRequest();
@@ -67,6 +78,7 @@
 		doAjax();
 		</script>
 		<button id="button" onclick="doAjax()">Click me!</button>
+		<button id="button" onclick="doAjaxNoTrailingSlash()">No trailing slash!</button>
 		<button id="button" onclick="doNoQueriesAjax()">No Queries AJAX!</button>
 		<button id="button" onclick="doCrossDomainAjax()">CORS!</button>
 
