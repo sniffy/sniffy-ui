@@ -482,22 +482,22 @@ io.sniffy = io.sniffy || (function(){
                         if (self.getAllResponseHeaders) {
                             var headers = self.getAllResponseHeaders();
                             if (headers) {
-                                hasSniffyHeader = headers.indexOf('X-Sql-Queries') !== -1;
+                                hasSniffyHeader = headers.indexOf('Sniffy-Sql-Queries') !== -1;
                             } else {
                                 hasSniffyHeader = false;
                             }
                         }
 
                         if (hasSniffyHeader) {
-                            var sqlQueries = self.getResponseHeader("X-Sql-Queries");
-                            var timeToFirstByte = self.getResponseHeader("X-Time-To-First-Byte");
+                            var sqlQueries = self.getResponseHeader("Sniffy-Sql-Queries");
+                            var timeToFirstByte = self.getResponseHeader("Sniffy-Time-To-First-Byte");
                             if ((sqlQueries && parseInt(sqlQueries) > 0) ||
                                 (timeToFirstByte && parseInt(timeToFirstByte))) {
 
                                 incrementQueryCounter(parseInt(sqlQueries));
                                 incrementServerTime(parseInt(timeToFirstByte));
 
-                                var xRequestDetailsHeader = self.getResponseHeader("X-Request-Details"); // details url relative to ajax original request
+                                var xRequestDetailsHeader = self.getResponseHeader("Sniffy-Request-Details"); // details url relative to ajax original request
 
                                 var ajaxUrl = document.createElement('a');
                                 ajaxUrl.href = url;

@@ -2,40 +2,40 @@ var express = require('express');
 var cors = require('cors');
 var app = express();
 
-app.use(cors({exposedHeaders: ['X-Sql-Queries', 'X-Request-Details', 'X-Time-To-First-Byte']}));
+app.use(cors({exposedHeaders: ['Sniffy-Sql-Queries', 'Sniffy-Request-Details', 'Sniffy-Time-To-First-Byte']}));
 //app.use(cors());
 
 var counter = 1000;
 
 app.get('/mock/ajax.json', function (req, res) {
-  res.header('X-Sql-Queries' , 2 );
-  res.header('X-Time-To-First-Byte' , 21 );
-  //res.header('X-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
-  res.header('X-Request-Details' , 'request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('Sniffy-Sql-Queries' , 2 );
+  res.header('Sniffy-Time-To-First-Byte' , 21 );
+  //res.header('Sniffy-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('Sniffy-Request-Details' , 'request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
   res.send('{"foo":"bar","baz":42}');
 });
 
 app.get('/mock/path/subpath/ajax.json', function (req, res) {
-  res.header('X-Sql-Queries' , 2 );
-  res.header('X-Time-To-First-Byte' , 21 );
-  //res.header('X-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
-  res.header('X-Request-Details' , '../../request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('Sniffy-Sql-Queries' , 2 );
+  res.header('Sniffy-Time-To-First-Byte' , 21 );
+  //res.header('Sniffy-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('Sniffy-Request-Details' , '../../request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
   res.send('{"foo":"bar","baz":42}');
 });
 
 app.get('/mock/notrailingslash', function (req, res) {
-  res.header('X-Sql-Queries' , 2 );
-  res.header('X-Time-To-First-Byte' , 21 );
-  //res.header('X-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
-  res.header('X-Request-Details' , './request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('Sniffy-Sql-Queries' , 2 );
+  res.header('Sniffy-Time-To-First-Byte' , 21 );
+  //res.header('Sniffy-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('Sniffy-Request-Details' , './request/a54b32e7-b94b-450b-b145-0cf62270d32a' );
   res.send('{"foo":"bar","baz":42}');
 });
 
 app.get('/mock/204.json', function (req, res) {
-  res.header('X-Sql-Queries' , 1 );
-  res.header('X-Time-To-First-Byte' , 21 );
-  //res.header('X-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
-  res.header('X-Request-Details' , 'request/b43a32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('Sniffy-Sql-Queries' , 1 );
+  res.header('Sniffy-Time-To-First-Byte' , 21 );
+  //res.header('Sniffy-Request-Id' , 'a54b32e7-b94b-450b-b145-0cf62270d32a' );
+  res.header('Sniffy-Request-Details' , 'request/b43a32e7-b94b-450b-b145-0cf62270d32a' );
   res.send('{"foo":"bar","baz":42}');
 });
 
