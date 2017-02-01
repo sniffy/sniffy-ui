@@ -146,7 +146,7 @@
 				    	'size' : 'mini',
 				    	'onSwitchChange' : function(event, state) {
 				    		$.ajax({
-							    url: window.parent.sniffy.baseUrl + 'connectionregistry/datasource/' + encodeURIComponent(item.url) + '/' + encodeURIComponent(item.userName),
+							    url: window.parent.sniffy.baseUrl + 'connectionregistry/datasource/' + encodeURIComponent(encodeURIComponent(item.url)) + '/' + encodeURIComponent(encodeURIComponent(item.userName)),
 							    type: state ? 'POST' : 'DELETE',
 							    success: function(result) {
 							        console.log(result);
@@ -173,7 +173,7 @@
 				    	'size' : 'mini',
 				    	'onSwitchChange' : function(event, state) {
 				    		$.ajax({
-							    url: window.parent.sniffy.baseUrl + 'connectionregistry/socket/' + encodeURIComponent(item.host) + '/' + encodeURIComponent(item.port),
+							    url: window.parent.sniffy.baseUrl + 'connectionregistry/socket/' + encodeURIComponent(encodeURIComponent(item.host)) + '/' + encodeURIComponent(encodeURIComponent(item.port)),
 							    type: state ? 'POST' : 'DELETE',
 							    success: function(result) {
 							        console.log(result);
