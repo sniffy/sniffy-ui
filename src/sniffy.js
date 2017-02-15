@@ -147,15 +147,15 @@ io.sniffy = io.sniffy || (function(){
                     ]),
                 queryWidgetContainer = EE('div', {'className' : 'sniffy-widget-icon-container'}, [
 
-                EE('div', {'className' : 'sniffy-network-outer sniffy-widget-icon'}, [
+                EE('div', {'className' : 'sniffy-network-outer sniffy-widget-icon', 'title' : 'Number of bytes transfered between server and downstream systems such as databases\nClick to toggle UI'}, [
                     EE('div', {'className' : 'sniffy-network-image sniffy-widget-icon-image'}, ''),
                     EE('div', {'className' : 'sniffy-network sniffy-widget-icon-label'}, '0')
                 ]),
-                EE('div', {'className' : 'sniffy-server-time-outer sniffy-widget-icon'}, [
+                EE('div', {'className' : 'sniffy-server-time-outer sniffy-widget-icon', 'title' : 'Elapsed server time\nClick to toggle UI'}, [
                     EE('div', {'className' : 'sniffy-server-time-image sniffy-widget-icon-image'}, ''),
                     EE('div', {'className' : 'sniffy-server-time sniffy-widget-icon-label'}, serverTime)
                 ]),
-                EE('div', {'className' : 'sniffy-query-count-outer sniffy-widget-icon'}, [
+                EE('div', {'className' : 'sniffy-query-count-outer sniffy-widget-icon', 'title' : 'Number of SQL queries produced by server to generate current page\nClick to toggle UI'}, [
                     EE('div', {'className' : 'sniffy-query-count-image sniffy-widget-icon-image'}, ''),
                     EE('div', {'className' : 'sniffy-query-count sniffy-widget-icon-label'}, sqlQueries)
                 ])
@@ -206,8 +206,8 @@ io.sniffy = io.sniffy || (function(){
 
             // todo persist maximized state; use some storage to keep the state between browser launches
             var toggleMaximizeIcon = $('span', $(iframeDocument.getElementById('sniffy-iframe-maximize'))).toggle(
-                {'$':'+glyphicon-resize-full -glyphicon-resize-small'},
-                {'$':'+glyphicon-resize-small -glyphicon-resize-full'}
+                {'$':'+glyphicon-resize-full -glyphicon-resize-small', 'title' : 'Maximize'},
+                {'$':'+glyphicon-resize-small -glyphicon-resize-full', 'title' : 'Minimize'}
             );
             var maximizeIframe = function() {
                 toggleIcon();
@@ -321,18 +321,18 @@ io.sniffy = io.sniffy || (function(){
 
                                         EE('td',[
                                             EE('span',[codeEl = EE('code',{'@class':'language-sql'},statement.query)]),
-                                            (statement.invocations && statement.invocations > 1) ? EE('span',{'@class':'label label-warning mx1'}, [
+                                            (statement.invocations && statement.invocations > 1) ? EE('span',{'@class':'label label-warning mx1','title':'Executed ' + statement.invocations + ' times'}, [
                                                 'x' + statement.invocations
                                                 ]) : null,
-                                            (statement.rows) ? EE('span',{'@class':'label label-info mx1'}, [
+                                            (statement.rows) ? EE('span',{'@class':'label label-info mx1','title':statement.rows + ' rows were returned or were affected by given query'}, [
                                                 statement.rows + ' rows',
                                                 EE('span',{'@class':'glyphicon glyphicon-menu-hamburger','@aria-hidden':'true'})
                                                 ]) : null,
-                                            EE('span',{'@class':'label label-success mx1'}, [
+                                            EE('span',{'@class':'label label-success mx1','title':statement.bytesDown + ' bytes received from the database'}, [
                                                 statement.bytesDown + ' bytes down',
                                                 EE('span',{'@class':'glyphicon glyphicon-arrow-down','@aria-hidden':'true'})
                                                 ]),
-                                            EE('span',{'@class':'label label-danger mx1'}, [
+                                            EE('span',{'@class':'label label-danger mx1','title':statement.bytesUp + ' bytes sent to the database'}, [
                                                 statement.bytesUp + ' bytes up',
                                                 EE('span',{'@class':'glyphicon glyphicon-arrow-up','@aria-hidden':'true'})
                                                 ])
@@ -384,11 +384,11 @@ io.sniffy = io.sniffy || (function(){
                                                 networkConnectionCodeEl = EE('code',{'@class':'language-sql'},
                                                     [
                                                     networkConnection.host,
-                                                    EE('span',{'@class':'label label-success mx1'}, [
+                                                    EE('span',{'@class':'label label-success mx1','title':networkConnection.bytesDown + ' bytes received from the downstream system'}, [
                                                         networkConnection.bytesDown + ' bytes down',
                                                         EE('span',{'@class':'glyphicon glyphicon-arrow-down','@aria-hidden':'true'})
                                                         ]),
-                                                    EE('span',{'@class':'label label-danger'}, [
+                                                    EE('span',{'@class':'label label-danger','title':networkConnection.bytesDown + ' bytes sent to the downstream system'}, [
                                                         networkConnection.bytesUp + ' bytes up',
                                                         EE('span',{'@class':'glyphicon glyphicon-arrow-up','@aria-hidden':'true'})
                                                         ])
