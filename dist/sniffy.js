@@ -460,10 +460,13 @@ io.sniffy = io.sniffy || (function(){
         var open = XHR.prototype.open;
         var send = XHR.prototype.send;
 
-        XHR.prototype.open = function(method, url, async, user, pass) {
+        XHR.prototype.open = function(method, url, isAsync, user, pass) {
             this._url = url;
             this._method = method;
-            open.call(this, method, url, async, user, pass);
+            if (isAsync === undefined) {
+                isAsync = true;
+            }
+            open.call(this, method, url, isAsync, user, pass);
         };
 
         XHR.prototype.send = function(data) {
