@@ -28,7 +28,8 @@ io.sniffy = io.sniffy || (function(){
         numberOfSqlQueries : 0,
         statementsCounter : 0,
         serverTime : 0,
-        networkBytes : 0
+        networkBytes : 0,
+        exceptions : 0
     };
 
     // util functions
@@ -74,6 +75,10 @@ io.sniffy = io.sniffy || (function(){
         window.sniffy.networkBytes += networkBytes;
     };
 
+    var incrementExceptions = function(exceptions) {
+        window.sniffy.exceptions += exceptions;
+    };
+
     // setup sniffer UI on dom ready
 
     $(function(){
@@ -114,7 +119,8 @@ io.sniffy = io.sniffy || (function(){
 
         var iframe = EE('iframe', {'$display' : 'none', '@id' : 'sniffy-iframe', 'className' : 'sniffy-iframe', '@scrolling' : 'no'});
         
-        var networkConnectionCounter = 1000; // TODO: do something smarter!
+        var networkConnectionCounter = 100000; // TODO: do something smarter!
+        var exceptionCounter = 200000; // TODO: do something smarter! 
 
         var iframeEl = iframe[0];
 
@@ -147,6 +153,10 @@ io.sniffy = io.sniffy || (function(){
                     ]),
                 queryWidgetContainer = EE('div', {'className' : 'sniffy-widget-icon-container'}, [
 
+                EE('div', {'className' : 'sniffy-exception-outer sniffy-widget-icon', 'title' : 'Number of exceptions thrown on server side\nClick to toggle UI'}, [
+                    EE('div', {'className' : 'sniffy-exception-image sniffy-widget-icon-image'}, ''),
+                    EE('div', {'className' : 'sniffy-exception sniffy-widget-icon-label'}, '0')
+                ]),
                 EE('div', {'className' : 'sniffy-network-outer sniffy-widget-icon', 'title' : 'Number of bytes transfered between server and downstream systems such as databases\nClick to toggle UI'}, [
                     EE('div', {'className' : 'sniffy-network-image sniffy-widget-icon-image'}, ''),
                     EE('div', {'className' : 'sniffy-network sniffy-widget-icon-label'}, '0')
@@ -194,11 +204,13 @@ io.sniffy = io.sniffy || (function(){
                 incrementQueryCounter(-1 * window.sniffy.numberOfSqlQueries);
                 incrementServerTime(-1 * window.sniffy.serverTime);
                 incrementNetworkBytes(-1 * window.sniffy.networkBytes);
+                incrementExceptions(-1 * window.sniffy.exceptions);
                 window.sniffy = {
                     numberOfSqlQueries : 0,
                     statementsCounter : 0,
                     serverTime : 0,
-                    networkBytes : 0
+                    networkBytes : 0,
+                    exceptions : 0
                 };
                 iframe.get('contentWindow').nanoScroller();
             });
@@ -249,6 +261,13 @@ io.sniffy = io.sniffy || (function(){
                 $('.sniffy-network').fill(formattedNetworkBytes);
                 $('.sniffy-network-outer').set('+sniffy-widget-icon-active');
                 setTimeout(function() {$('.sniffy-network-outer').set('-sniffy-widget-icon-active');}, 400);
+            };
+
+            incrementExceptions = function(exceptions) {
+                window.sniffy.exceptions += exceptions;
+                $('.sniffy-exception').fill(window.sniffy.exceptions);
+                $('.sniffy-exception-outer').set('+sniffy-widget-icon-active');
+                setTimeout(function() {$('.sniffy-exception-outer').set('-sniffy-widget-icon-active');}, 400);
             };
 
             var showStackClickHandler = function(num, linesCount) {
@@ -313,6 +332,7 @@ io.sniffy = io.sniffy || (function(){
                                 for (var i = 0; i < statements.length; i++) {
                                     var statement = statements[i];
 
+                                    // TODO: update query counter - otherwise might be missing something
                                     incrementNetworkBytes(statement.bytesDown+statement.bytesUp);
 
                                     var codeEl, stackEl, statementId = ++window.sniffy.statementsCounter;
@@ -422,6 +442,56 @@ io.sniffy = io.sniffy || (function(){
                                             ])
                                         ]));
                                         iframe.get('contentWindow').hljs.highlightBlock(networkConnectionStackEl[0]);
+                                    }
+                                }
+                            }
+                            var exceptions = stats.exceptions;
+                            if (exceptions && exceptions.length !== 0) {
+                                
+                                incrementExceptions(exceptions.length);
+
+                                for (var k = 0; k < exceptions.length; k++) {
+
+                                    var exception = exceptions[k];
+                                    var exceptionId = ++exceptionCounter;
+                                    var exceptionCodeEl, exceptionStackEl;
+                                    // sql + elapsed time
+                                    statementsTableBody.add(EE('tr',[
+                                        EE('td',[EE('div',
+                                            [
+                                                exceptionCodeEl = EE('code',{'@class':'language-sql'},
+                                                    [
+                                                    exception.class + ' ' + exception.message
+                                                    ]
+                                                )
+                                            ])]),
+                                        EE('td')
+                                    ]));
+                                    iframe.get('contentWindow').hljs.highlightBlock(exceptionCodeEl[0]);
+                                    // stack trace
+                                    if (exception.stackTrace && exception.stackTrace.length > 0) {
+                                        exception.stackTrace = exception.stackTrace.replace(/\r\n|\n/g, '\r\n');
+                                        var exceptionLinesCount = exception.stackTrace.split('\r\n').length;
+                                        statementsTableBody.add(EE('tr',[
+                                            EE('td',{'@colspan': 2 }, [
+                                                EE('div',[
+                                                    EE('button', {'@class': 'btn btn-link btn-xs show-stack', '@id' :'show-stack-' + exceptionId}, 'Stack trace')
+                                                        .on('click', showStackClickHandler(exceptionId, exceptionLinesCount)),
+                                                    exceptionStackEl = EE('code',
+                                                        {'@class':'java',
+                                                            '$display' : 'none',
+                                                            '$overflow' : 'hidden',
+                                                            '@id' : 'stack-trace-' + exceptionId},
+                                                        exception.stackTrace),
+                                                    EE('div', {'@class': 'show-all-stack', '$display' : 'none', '@id' :'show-all-stack-' + exceptionId},[
+                                                        EE('button', {
+                                                            '@class': 'btn btn-link btn-xs', '@id' :'show-all-stack-link-' + exceptionId
+                                                        }, 'Show all').on('click', showAllStackHandler(exceptionId))
+                                                    ])
+                                                ])
+                                            ])
+                                        ]));
+                                        iframe.get('contentWindow').hljs.highlightBlock(exceptionStackEl[0]);
                                     }
                                 }
                             }
