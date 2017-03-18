@@ -534,6 +534,7 @@ io.sniffy = io.sniffy || (function(){
             this._method = method;
             this._url = url;
             open.apply(this, arguments);
+            this.setRequestHeader('Sniffy-Inject-Html-Enabled','false');
         };
 
         XHR.prototype.send = function(data) {
