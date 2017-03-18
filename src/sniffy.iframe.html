@@ -22,6 +22,7 @@
 			<ul class="nav nav-tabs" role="tablist">
 			    <li role="presentation" class="active"><a href="#executedqueries" aria-controls="executedqueries" role="tab" data-toggle="tab">Executed Queries</a></li>
 			    <li role="presentation"><a href="#networkconnections" aria-controls="networkconnections" role="tab" data-toggle="tab">Network Connections</a></li>
+			    <li role="presentation"><a href="#topsql" aria-controls="topsql" role="tab" data-toggle="tab">Top SQL</a></li>
 			  </ul>
 		</div>
 		<div style="position:absolute; top:38px; bottom:38px; left:0px; right: 0px" class="tab-content">
@@ -82,6 +83,19 @@
 								</tbody>
 							</table>
 					    </div>
+					    <div role="tabpanel" class="tab-pane" id="topsql">
+					    	<table class="table table-hover">
+								<thead>
+									<tr>
+										<th class="col-md-10">SQL</th>
+										<th class="col-md-1">Count</th>
+										<th class="col-md-1">Mean (ms)</th>
+									</tr>
+								</thead>
+								<tbody id="sniffy-top-sql">
+								</tbody>
+							</table>
+					    </div>
 				    </div>	
 				</div>	
 			</div>
@@ -101,9 +115,33 @@
 		function nanoScroller() {
 			$("#sniffy-queries-div").nanoScroller();
 	    }	    
+	    function round(number, precision) {
+		    var factor = Math.pow(10, precision);
+		    var tempNumber = number * factor;
+		    var roundedTempNumber = Math.round(tempNumber);
+		    return roundedTempNumber / factor;
+		};
 	    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		  nanoScroller();
 		});	    
+		$('a[href="#topsql"]').on('shown.bs.tab', function (e) {
+	    	$.ajax({
+	    		url : window.parent.sniffy.baseUrl + 'topsql/',
+	    		dataType: "json"
+	    	}).done(function(data) {
+	    		$('#sniffy-top-sql').empty();
+	    		data.sort(function(a,b) {return b.timer.mean - a.timer.mean});
+	    		$.each(data, function(i, item) {
+	    			var codeEl = $('<code class="language-sql">');
+			        $('<tr>').append(
+			            $('<td>').append(codeEl.text(item.sql)),
+			            $('<td>').text(item.timer.count),
+			            $('<td>').text(round(item.timer.mean / 1000 / 1000, 3))
+			        ).appendTo('#sniffy-top-sql');
+			        hljs.highlightBlock(codeEl.get(0));
+			    });
+	    	});
+	    });
 	    $('a[href="#networkconnections"]').on('shown.bs.tab', function (e) {
 	    	$.ajax({
 	    		url : window.parent.sniffy.baseUrl + 'connectionregistry/',
@@ -130,7 +168,7 @@
 			    	}
 			    });
 
-	    		$.each(data.dataSources, function(i, item) {
+	    		if (data.dataSources) $.each(data.dataSources, function(i, item) {
 	    			var toggleButton;
 			        $('<tr>').append(
 			            $('<td>').text(item.url),
@@ -157,7 +195,7 @@
 			    });
 
 	    		$('#sniffy-socket-registry').empty();
-	    		$.each(data.sockets, function(i, item) {
+	    		if (data.sockets) $.each(data.sockets, function(i, item) {
 	    			var toggleButton;
 			        $('<tr>').append(
 			            $('<td>').text(item.host),
