@@ -207,7 +207,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-notify');
 
     // Default task
-    grunt.registerTask('default', ['less', 'imageEmbed', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
+    grunt.registerTask('default', ['less', 'imageEmbed', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy', 'maven:install']);
 
     if (pkg.version.indexOf('SNAPSHOT') !== -1) {
         grunt.registerTask('travis', ['default', 'maven:deploy']);
