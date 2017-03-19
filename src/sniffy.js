@@ -210,7 +210,8 @@ io.sniffy = io.sniffy || (function(){
                     statementsCounter : 0,
                     serverTime : 0,
                     networkBytes : 0,
-                    exceptions : 0
+                    exceptions : 0,
+                    baseUrl : window.sniffy.baseUrl
                 };
                 iframe.get('contentWindow').nanoScroller();
             });
@@ -534,6 +535,7 @@ io.sniffy = io.sniffy || (function(){
             this._method = method;
             this._url = url;
             open.apply(this, arguments);
+            this.setRequestHeader('Sniffy-Inject-Html-Enabled','false');
         };
 
         XHR.prototype.send = function(data) {
