@@ -210,7 +210,8 @@ io.sniffy = io.sniffy || (function(){
                     statementsCounter : 0,
                     serverTime : 0,
                     networkBytes : 0,
-                    exceptions : 0
+                    exceptions : 0,
+                    baseUrl : window.sniffy.baseUrl
                 };
                 iframe.get('contentWindow').nanoScroller();
             });

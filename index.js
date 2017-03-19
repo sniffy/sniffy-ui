@@ -78,6 +78,10 @@ app.delete('/mock/connectionregistry/persistent/', function (req, res) {
   res.status(201);
   res.send();
 });
+app.delete('/mock/topsql/', function (req, res) {
+  res.status(201);
+  res.send();
+});
 
 app.use('/mock', express.static('mock'));
 
