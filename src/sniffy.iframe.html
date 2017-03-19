@@ -88,12 +88,21 @@
 								<thead>
 									<tr>
 										<th class="col-md-10">SQL</th>
-										<th class="col-md-1">Count</th>
-										<th class="col-md-1">Mean (ms)</th>
+										<th class="col-md-1" role="button" id="top-sql-count-header">Count<span class="glyphicon"></span></th>
+										<th class="col-md-1" role="button" title="Mean time in milliseconds" id="top-sql-mean-header">Mean<span class="glyphicon glyphicon-sort-by-order-alt"></span></th>
 									</tr>
 								</thead>
 								<tbody id="sniffy-top-sql">
 								</tbody>
+								<tfoot>
+									<tr>
+										<td class="col-md-10">
+											<button type="button" class="btn btn-default" id="reset-top-sql">Reset gathered queries</button>
+										</td>
+										<td class="col-md-1"></td>
+										<td class="col-md-1"></td>
+									</tr>
+								</tfoot>
 							</table>
 					    </div>
 				    </div>	
@@ -124,24 +133,112 @@
 	    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 		  nanoScroller();
 		});	    
-		$('a[href="#topsql"]').on('shown.bs.tab', function (e) {
+		
+		var sort = 2;
+	    var topSqls = new Array();
+
+	    $('#top-sql-count-header').click(function() {
+	    	if (1 === sort) {
+	    		sort = -1;
+	    	} else {
+	    		sort = 1;
+	    	}
+	    	sortAndRenderTopSql();
+	    });
+
+	    $('#top-sql-mean-header').click(function() {
+	    	if (2 === sort) {
+	    		sort = -2;
+	    	} else {
+	    		sort = 2;
+	    	}
+	    	sortAndRenderTopSql();
+	    });
+
+	    function sortAndRenderTopSql() {
+
+	    	switch (sort) {
+	    		case -1:
+	    			$('#top-sql-count-header span').addClass('glyphicon-sort-by-order');
+	    			$('#top-sql-count-header span').removeClass('glyphicon-sort-by-order-alt');
+
+	    			$('#top-sql-mean-header span').removeClass('glyphicon-sort-by-order');
+	    			$('#top-sql-mean-header span').removeClass('glyphicon-sort-by-order-alt');
+	    			break;
+	    		case -2:
+	    			$('#top-sql-mean-header span').addClass('glyphicon-sort-by-order');
+	    			$('#top-sql-mean-header span').removeClass('glyphicon-sort-by-order-alt');
+
+	    			$('#top-sql-count-header span').removeClass('glyphicon-sort-by-order');
+	    			$('#top-sql-count-header span').removeClass('glyphicon-sort-by-order-alt');
+	    			break;
+	    		case 1:
+	    			$('#top-sql-count-header span').addClass('glyphicon-sort-by-order-alt');
+	    			$('#top-sql-count-header span').removeClass('glyphicon-sort-by-order');
+
+	    			$('#top-sql-mean-header span').removeClass('glyphicon-sort-by-order');
+	    			$('#top-sql-mean-header span').removeClass('glyphicon-sort-by-order-alt');
+	    			break;
+    			default:
+	    		case 2:
+	    			$('#top-sql-mean-header span').addClass('glyphicon-sort-by-order-alt');
+	    			$('#top-sql-mean-header span').removeClass('glyphicon-sort-by-order');
+
+	    			$('#top-sql-count-header span').removeClass('glyphicon-sort-by-order');
+	    			$('#top-sql-count-header span').removeClass('glyphicon-sort-by-order-alt');
+	    			break;
+	    	}
+
+	    	$('#sniffy-top-sql').empty();
+    		topSqls.sort(function(a,b) {
+    			switch (sort) {
+    				case -1:
+    					return a.timer.count - b.timer.count
+    					break;
+    				case -2:
+    					return a.timer.mean - b.timer.mean
+    					break;
+    				case 1:
+    					return b.timer.count - a.timer.count
+    					break;
+    				default:
+    				case 2:
+    					return b.timer.mean - a.timer.mean
+    					break;
+    			}
+    		});
+    		$.each(topSqls, function(i, item) {
+    			var codeEl = $('<code class="language-sql">');
+		        $('<tr>').append(
+		            $('<td>').append(codeEl.text(item.sql)),
+		            $('<td>').text(item.timer.count),
+		            $('<td>').text(round(item.timer.mean / 1000 / 1000, 3))
+		        ).appendTo('#sniffy-top-sql');
+		        hljs.highlightBlock(codeEl.get(0));
+		    });
+	    }
+
+	    function loadTopSql() {
 	    	$.ajax({
 	    		url : window.parent.sniffy.baseUrl + 'topsql/',
 	    		dataType: "json"
 	    	}).done(function(data) {
-	    		$('#sniffy-top-sql').empty();
-	    		data.sort(function(a,b) {return b.timer.mean - a.timer.mean});
-	    		$.each(data, function(i, item) {
-	    			var codeEl = $('<code class="language-sql">');
-			        $('<tr>').append(
-			            $('<td>').append(codeEl.text(item.sql)),
-			            $('<td>').text(item.timer.count),
-			            $('<td>').text(round(item.timer.mean / 1000 / 1000, 3))
-			        ).appendTo('#sniffy-top-sql');
-			        hljs.highlightBlock(codeEl.get(0));
-			    });
+	    		topSqls = data;
+	    		sortAndRenderTopSql();
+	    	});
+	    }
+
+	    $('#reset-top-sql').click(function(e){
+			$.ajax({
+	    		url : window.parent.sniffy.baseUrl + 'topsql/',
+	    		type: 'DELETE'
+	    	}).done(function(data) {
+	    		loadTopSql();
 	    	});
 	    });
+
+		$('a[href="#topsql"]').on('shown.bs.tab', loadTopSql);
+
 	    $('a[href="#networkconnections"]').on('shown.bs.tab', function (e) {
 	    	$.ajax({
 	    		url : window.parent.sniffy.baseUrl + 'connectionregistry/',
