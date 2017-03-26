@@ -239,6 +239,19 @@
 
 		$('a[href="#topsql"]').on('shown.bs.tab', loadTopSql);
 
+		$('#persistent').bootstrapSwitch({
+		        'size': 'mini',
+		        'onSwitchChange': function (event, state) {
+		            $.ajax({
+		                url: window.parent.sniffy.baseUrl + 'connectionregistry/persistent/',
+		                type: state ? 'POST' : 'DELETE',
+		                success: function (result) {
+		                    console.log(result);
+		                }
+		            });
+		        }
+		    });
+
 	    $('a[href="#networkconnections"]').on('shown.bs.tab', function (e) {
 	    	$.ajax({
 	    		url : window.parent.sniffy.baseUrl + 'connectionregistry/',
@@ -246,24 +259,11 @@
 	    	}).done(function(data) {
 	    		$('#sniffy-datasource-registry').empty();
 
-				var persistentToggleButton = $('#persistent');
-
 				if (true === data.persistent) {
-					persistentToggleButton.attr('checked', true);
-				}
-
-				persistentToggleButton.bootstrapSwitch({
-			    	'size' : 'mini',
-			    	'onSwitchChange' : function(event, state) {
-			    		$.ajax({
-						    url: window.parent.sniffy.baseUrl + 'connectionregistry/persistent/',
-						    type: state ? 'POST' : 'DELETE',
-						    success: function(result) {
-						        console.log(result);
-						    }
-						});
-			    	}
-			    });
+		            $('#persistent').bootstrapSwitch('state', true, true);
+		        } else {
+		            $('#persistent').bootstrapSwitch('state', false, true);
+		        }
 
 	    		if (data.dataSources) $.each(data.dataSources, function(i, item) {
 	    			var toggleButton;
