@@ -6,6 +6,7 @@ app.use(cors({exposedHeaders: ['Sniffy-Sql-Queries', 'Sniffy-Request-Details', '
 //app.use(cors());
 
 var counter = 1000;
+var persistent = false;
 
 app.get('/mock/ajax.json', function (req, res) {
   res.header('Sniffy-Sql-Queries' , 2 );
@@ -42,7 +43,7 @@ app.get('/mock/204.json', function (req, res) {
 app.get('/mock/connectionregistry/', function (req, res) {
   res.status(200);
   res.header('Content-Type','application/json');
-  res.send('{"persistent":true,"sockets":[{"host":"en.wikipedia.org","port":"443","status":"OPEN"},{"host":"192.168.99.100","port":"3306","status":"CLOSED"}]' 
+  res.send('{"persistent":' + persistent + ',"sockets":[{"host":"en.wikipedia.org","port":"443","status":"OPEN"},{"host":"192.168.99.100","port":"3306","status":"CLOSED"}]' 
     + ',"dataSources":[{"url":"jdbc:h2:mem:/something:","userName":"sa","status":"OPEN"}]'
     + '}');
 });
@@ -62,6 +63,7 @@ app.post('/mock/connectionregistry/datasource/*', function (req, res) {
   res.send();
 });
 app.post('/mock/connectionregistry/persistent/', function (req, res) {
+  persistent = true;
   res.status(201);
   res.send();
 });
@@ -75,6 +77,7 @@ app.delete('/mock/connectionregistry/datasource/*', function (req, res) {
   res.send();
 });
 app.delete('/mock/connectionregistry/persistent/', function (req, res) {
+  persistent = false;
   res.status(201);
   res.send();
 });
