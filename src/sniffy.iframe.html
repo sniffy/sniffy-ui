@@ -10,8 +10,8 @@
 </head>
 <body>
 	<div class="panel panel-primary" style="height: 100%; margin: 0">
-		<div class="panel-heading" style="position:absolute; top:0px; left:0px; height:38px; right:0px;overflow:hidden;">
-			<div style="float: right">
+		<div class="panel-heading" style="position:absolute; top:0px; left:0px; height:38px; right:0px; overflow:hidden; padding: 0">
+			<div style="float: right; padding: 10px 15px;">
 			
 				<a href="javascript:void(0);" id="sniffy-iframe-erase" title="Clear data"><span class="glyphicon glyphicon-erase" aria-hidden="true"></span></a>
 				<a href="javascript:void(0);" class="clipboard" data-clipboard-target="#sniffy-queries" title="Copy report to clipboard"><span class="glyphicon glyphicon-copy" aria-hidden="true"></span></a>
@@ -19,7 +19,7 @@
 				<a href="javascript:void(0);" id="sniffy-iframe-close" title="Close"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
 			</div>	
 			<!-- <h3 class="panel-title">Executed Queries</h3> -->
-			<ul class="nav nav-tabs" role="tablist">
+			<ul class="nav nav-tabs" role="tablist" style="padding: 6px 15px">
 			    <li role="presentation" class="active"><a href="#executedqueries" aria-controls="executedqueries" role="tab" data-toggle="tab">Executed Queries</a></li>
 			    <li role="presentation"><a href="#networkconnections" aria-controls="networkconnections" role="tab" data-toggle="tab">Network Connections</a></li>
 			    <li role="presentation"><a href="#topsql" aria-controls="topsql" role="tab" data-toggle="tab">Top SQL</a></li>
@@ -239,6 +239,21 @@
 
 		$('a[href="#topsql"]').on('shown.bs.tab', loadTopSql);
 
+		$('#persistent').bootstrapSwitch({
+		        'size': 'mini',
+		        'handleWidth': 34,
+		        'labelWidth': 34,
+		        'onSwitchChange': function (event, state) {
+		            $.ajax({
+		                url: window.parent.sniffy.baseUrl + 'connectionregistry/persistent/',
+		                type: state ? 'POST' : 'DELETE',
+		                success: function (result) {
+		                    console.log(result);
+		                }
+		            });
+		        }
+		    });
+
 	    $('a[href="#networkconnections"]').on('shown.bs.tab', function (e) {
 	    	$.ajax({
 	    		url : window.parent.sniffy.baseUrl + 'connectionregistry/',
@@ -246,24 +261,11 @@
 	    	}).done(function(data) {
 	    		$('#sniffy-datasource-registry').empty();
 
-				var persistentToggleButton = $('#persistent');
-
 				if (true === data.persistent) {
-					persistentToggleButton.attr('checked', true);
-				}
-
-				persistentToggleButton.bootstrapSwitch({
-			    	'size' : 'mini',
-			    	'onSwitchChange' : function(event, state) {
-			    		$.ajax({
-						    url: window.parent.sniffy.baseUrl + 'connectionregistry/persistent/',
-						    type: state ? 'POST' : 'DELETE',
-						    success: function(result) {
-						        console.log(result);
-						    }
-						});
-			    	}
-			    });
+		            $('#persistent').bootstrapSwitch('state', true, true);
+		        } else {
+		            $('#persistent').bootstrapSwitch('state', false, true);
+		        }
 
 	    		if (data.dataSources) $.each(data.dataSources, function(i, item) {
 	    			var toggleButton;
@@ -279,6 +281,8 @@
 				    }
 			        toggleButton.bootstrapSwitch({
 				    	'size' : 'mini',
+				        'handleWidth': 34,
+				        'labelWidth': 34,
 				    	'onSwitchChange' : function(event, state) {
 				    		$.ajax({
 							    url: window.parent.sniffy.baseUrl + 'connectionregistry/datasource/' + encodeURIComponent(encodeURIComponent(item.url)) + '/' + encodeURIComponent(encodeURIComponent(item.userName)),
@@ -306,6 +310,8 @@
 				    }
 			        toggleButton.bootstrapSwitch({
 				    	'size' : 'mini',
+				        'handleWidth': 34,
+				        'labelWidth': 34,
 				    	'onSwitchChange' : function(event, state) {
 				    		$.ajax({
 							    url: window.parent.sniffy.baseUrl + 'connectionregistry/socket/' + encodeURIComponent(encodeURIComponent(item.host)) + '/' + encodeURIComponent(encodeURIComponent(item.port)),

@@ -6,7 +6,7 @@
 
     <groupId>io.sniffy</groupId>
     <artifactId>sniffy-ui</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.3</version>
 
     <name>Sniffy</name>
     <url>http://sniffy.io/</url>
