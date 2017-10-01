@@ -43,8 +43,8 @@ app.get('/mock/204.json', function (req, res) {
 app.get('/mock/connectionregistry/', function (req, res) {
   res.status(200);
   res.header('Content-Type','application/json');
-  res.send('{"persistent":' + persistent + ',"sockets":[{"host":"en.wikipedia.org","port":"443","status":"OPEN"},{"host":"192.168.99.100","port":"3306","status":"CLOSED"}]' 
-    + ',"dataSources":[{"url":"jdbc:h2:mem:/something:","userName":"sa","status":"OPEN"}]'
+  res.send('{"persistent":' + persistent + ',"sockets":[{"host":"en.wikipedia.org","port":"443","status":100},{"host":"192.168.99.100","port":"3306","status":-50}]' 
+    + ',"dataSources":[{"url":"jdbc:h2:mem:/something:","userName":"sa","status":0}]'
     + '}');
 });
 
