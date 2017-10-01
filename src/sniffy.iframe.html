@@ -211,7 +211,8 @@
     			}
     		});
     		$.each(topSqls, function(i, item) {
-    			var codeEl = $('<code class="language-sql">');
+				var codeEl = $('<code class="language-sql">');
+				item.sql = item.sql.replace(/\r\n|\n/g, ' \r\n');
 		        $('<tr>').append(
 		            $('<td>').append(codeEl.text(item.sql)),
 		            $('<td>').text(item.timer.count),
