@@ -338,6 +338,7 @@ io.sniffy = io.sniffy || (function(){
 
                                     var codeEl, stackEl, statementId = ++window.sniffy.statementsCounter;
                                     // sql + elapsed time
+                                    statement.query = statement.query.replace(/\r\n|\n/g, ' \r\n');
                                     statementsTableBody.add(EE('tr', [
 
                                         EE('td',[
