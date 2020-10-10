@@ -115,7 +115,7 @@
                 <repository>
                     <id>github</id>
                     <name>GitHub Sniffy Apache Maven Packages</name>
-                    <url>https://maven.pkg.github.com/sniffy/sniffy</url>
+                    <url>https://maven.pkg.github.com/sniffy/sniffy-ui</url>
                 </repository>
             </distributionManagement>
         </profile>
