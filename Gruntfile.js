@@ -123,43 +123,6 @@ module.exports = function (grunt) {
               }
             }
         },
-        maven: {
-            options: {
-              groupId: 'io.sniffy',
-              artifactId : 'sniffy-ui'
-            },
-            install : {
-              options : {
-                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
-                packaging : 'jar'
-              },
-              src : ['dist/*'],
-              expand : true
-            },
-            deploy : {
-              options : {
-                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
-                packaging : 'jar',
-                url : 'https://oss.sonatype.org/content/repositories/snapshots/',
-                settingsXml : 'settings.xml',
-                repositoryId : 'sonatype-nexus-snapshots'
-              },
-              src : ['dist/*'],
-              expand : true
-            },
-            stage : {
-              options : {
-                goal : 'deploy',
-                destFolder : 'META-INF/resources/webjars/sniffy/<%= pkg.version %>',
-                packaging : 'jar',
-                url : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/',
-                repositoryId : 'sonatype-nexus-staging'
-              },
-              src : ['dist/*'],
-              expand : true
-            }
-            
-        },
         watch: {
             gruntfile: {
                 files: '<%= jshint.gruntfile.src %>',
