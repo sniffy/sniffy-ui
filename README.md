@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/sniffy/sniffy-ui.svg?branch=develop)](https://travis-ci.org/sniffy/sniffy-ui)
+![Node.js CI](https://github.com/sniffy/sniffy-ui/workflows/Node.js%20CI/badge.svg)
 [![Dependency Status](https://david-dm.org/sniffy/sniffy-ui.svg)](https://david-dm.org/sniffy/sniffy-ui)
 [![devDependency Status](https://david-dm.org/sniffy/sniffy-ui/dev-status.svg)](https://david-dm.org/sniffy/sniffy-ui#info=devDependencies)
 
