@@ -590,8 +590,8 @@ io.sniffy = io.sniffy || (function(){
                                     (location.protocol === ajaxUrl.protocol && location.host === ajaxUrl.host) ?
                                         (ajaxUrl.pathname.slice(0,1) === '/' ? ajaxUrl.pathname : '/' + ajaxUrl.pathname) +
                                             ajaxUrl.search + ajaxUrl.hash : ajaxUrl.href;
-
-                                loadQueries(method + ' ' + ajaxUrlLabel, requestDetailsUrl, timeToFirstByte, false);
+                                // for main query we need to take method and status from server
+                                loadQueries(method + ' ' + ajaxUrlLabel + ' - ' + self.status, requestDetailsUrl, timeToFirstByte, false);
                             }
                         }
                     } catch (e) {
