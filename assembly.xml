@@ -8,8 +8,8 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>/</directory>
-      <outputDirectory>/META-INF/resources/webjars/sniffy/${project.version}</outputDirectory>
+      <directory>.</directory>
+      <outputDirectory>META-INF/resources/webjars/sniffy/${project.version}</outputDirectory>
       <includes>
         <include>dist/*</include>
       </includes>
