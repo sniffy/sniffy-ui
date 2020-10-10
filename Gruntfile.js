@@ -166,17 +166,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-notify');
     grunt.loadNpmTasks("grunt-image-embed");
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-maven-tasks');
     grunt.loadNpmTasks('grunt-notify');
 
     // Default task
-    grunt.registerTask('default', ['less', 'imageEmbed', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy', 'maven:install']);
-
-    if (pkg.version.indexOf('SNAPSHOT') !== -1) {
-        grunt.registerTask('travis', ['default', 'maven:deploy']);
-    } else {
-        grunt.registerTask('travis', ['default']);
-    }
+    grunt.registerTask('default', ['less', 'imageEmbed', 'includereplace:iframe', 'htmlmin', 'jshint', 'includereplace:dist', 'uglify', 'copy']);
 
     grunt.task.run('notify_hooks');
 };
