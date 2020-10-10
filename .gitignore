@@ -30,6 +30,8 @@ bower_components
 
 build
 
+dist
+
 .idea
 
 COMMIT_MSG
