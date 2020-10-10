@@ -15,7 +15,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
-        <spring.version>4.2.5.RELEASE</spring.version>
     </properties>
 
     <scm>
@@ -41,28 +40,38 @@
 
     <build>
 
-        <directory>${project.basedir}/build</directory>
-
+        <resources>
+            <resource>
+                <directory>target/grunt-generated-resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
 
         <plugins>
-             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.3</version>
-                <configuration>
-                  <descriptor>assembly.xml</descriptor>
-                  <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
                 <executions>
-                  <execution>
-                    <id>create-archive</id>
-                    <phase>package</phase>
-                    <goals>
-                      <goal>single</goal>
-                    </goals>
-                  </execution>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/grunt-generated-resources/META-INF/resources/webjars/sniffy/${project.version}/dist</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>dist</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
                 </executions>
-              </plugin>
-              <plugin>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>

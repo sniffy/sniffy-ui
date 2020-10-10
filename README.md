@@ -5,11 +5,16 @@
 # sniffy-ui
 Sniffy UI 
 
+## Prerequisites
+
+Node and NPM
+Grunt CLI (`npm install -g grunt-cli`)
+
 ## Building
 
 ```
 npm install
-bower install
+./node_modules/.bin/bower install
 grunt
 ```
 
