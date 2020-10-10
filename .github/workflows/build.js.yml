@@ -5,6 +5,11 @@ name: Check PR
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
+      - release/*
+      - hotfix/*
   pull_request:
     branches-ignore:
       - tag/*
