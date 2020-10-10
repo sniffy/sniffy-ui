@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - release/*
-      - master
       - develop
+  release:
+    types: [created]
 
 jobs:
   build:
