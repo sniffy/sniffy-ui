@@ -103,6 +103,8 @@ io.sniffy = io.sniffy || (function(){
 
         var snifferHeaderElement = $('#sniffy-header');
         var requestId = snifferHeaderElement.get('%request-id');
+        var requestMethod = snifferHeaderElement.get('%request-method');
+        var responseCode = snifferHeaderElement.get('%response-code');
         var snifferScriptSrc = snifferHeaderElement.get('@src');
         var baseUrl = snifferScriptSrc.substring(0, snifferScriptSrc.lastIndexOf('/') + 1);
 
@@ -309,7 +311,7 @@ io.sniffy = io.sniffy || (function(){
             incrementServerTime(parseInt(serverTime));
 
             // request data
-            loadQueries(location.pathname, baseUrl + 'request/' + requestId, parseInt(serverTime), true);
+            loadQueries((requestMethod ? requestMethod + ' ' : '') + location.pathname + (responseCode ? ' - ' + responseCode : ''), baseUrl + 'request/' + requestId, parseInt(serverTime), true);
 
             loadQueries = function(url, requestDetailsUrl, timeToFirstByte, doNotUpdateTimeCounter) {
                 $.request('get', requestDetailsUrl, null, {xhr : {dataType : 'json'}})
