@@ -31,6 +31,12 @@ bower_components
 target
 
 dist
+dist/
+dist/*
+
+build
+build/
+build/*
 
 .idea
 
