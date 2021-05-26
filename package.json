@@ -3,7 +3,7 @@
   "title": "UI for Sniffy",
   "author": "bedrin <Dmitry.Bedrin@gmail.com>",
   "license": "MIT",
-  "version": "3.1.8",
+  "version": "3.1.13",
   "repository": {
     "type": "git",
     "url": "https://github.com/sniffy/sniffy-ui.git"
@@ -12,8 +12,8 @@
     "test": "grunt travis"
   },
   "dependencies": {
-    "cors": "^2.7.1",
-    "express": "^4.13.3"
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
   },
   "devDependencies": {
     "bower": "^1.7.7",
